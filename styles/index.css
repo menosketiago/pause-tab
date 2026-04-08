@@ -1,0 +1,13 @@
+html {
+    box-sizing: border-box;
+    min-width: 480px;
+    margin: 0;
+    padding: 24px;
+    background: #f5f5f5;
+}
+
+*,
+*:before,
+*:after {
+    box-sizing: inherit;
+}
