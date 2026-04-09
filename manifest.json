@@ -14,5 +14,8 @@
     ],
     "background": {
         "service_worker": "scripts/background.js"
-    }
+    },
+    "host_permissions": [
+        "<all_urls>"
+    ]
 }
