@@ -1,4 +1,3 @@
-// CREATE MENU ITEM
 chrome.runtime.onInstalled.addListener(() => {
     chrome.contextMenus.create({
         id: "pause-this-tab",
@@ -7,42 +6,68 @@ chrome.runtime.onInstalled.addListener(() => {
     });
 });
 
-// LISTEN TO CLICK ON MENU ITEM
 chrome.contextMenus.onClicked.addListener((info, tab) => {
     if (info.menuItemId === "pause-this-tab") {
-        
-        // 1. Inject the CSS file
         chrome.scripting.insertCSS({
             target: { tabId: tab.id },
             files: ["styles/index.css"]
         });
 
-        // 2. Inject the Logic
         chrome.scripting.executeScript({
             target: { tabId: tab.id },
             func: () => {
-                // Prevent duplicate overlays
                 if (document.getElementById('pause-tab-overlay')) return;
+
+                const fontUrl = chrome.runtime.getURL("fonts/Nunito-VariableFont_wght.ttf");
+                const styleBlock = document.createElement('style');
+                styleBlock.textContent = "@font-face { font-family: 'Nunito'; src: url('" + fontUrl + "') format('truetype'); font-weight: 200 1000; }";
+                document.head.appendChild(styleBlock);
 
                 const overlay = document.createElement('div');
                 overlay.id = 'pause-tab-overlay';
                 overlay.innerHTML = `
                     <article>
                         <h1>Tab paused</h1>
-                        <p>Take a moment to stretch, grab a coffee, or just breathe. Click the "resume now" button to unpause the tab.</p>
+                        <p>Hurray you for taking a break from the doomscrolling!</p>
+                        <p>When you are ready, hold the button below for 5 seconds to resume.</p>
                         <footer>
-                            <button id="resume-button" class="primary">Resume now</button>
+                            <button id="resume-button" class="primary"><span id="hold-label">Hold to resume</span></button>
                         </footer>
                     </article>
                 `;
-
                 document.body.appendChild(overlay);
 
-                // Target the specific button for removal
-                const resumeBtn = document.getElementById('resume-button');
-                resumeBtn.addEventListener('click', () => {
-                    overlay.remove();
-                });
+                const btn = document.getElementById('resume-button');
+                const lbl = document.getElementById('hold-label');
+                let timer, interval, remaining;
+
+                const start = () => {
+                    remaining = 5;
+                    btn.classList.add('is-holding');
+                    lbl.innerText = remaining;
+                    interval = setInterval(() => {
+                        remaining--;
+                        lbl.innerText = remaining > 0 ? remaining : "";
+                    }, 1000);
+                    timer = setTimeout(() => {
+                        overlay.remove();
+                        styleBlock.remove();
+                        clearInterval(interval);
+                    }, 5000);
+                };
+
+                const stop = () => {
+                    clearTimeout(timer);
+                    clearInterval(interval);
+                    btn.classList.remove('is-holding');
+                    lbl.innerText = "Hold to resume";
+                };
+
+                btn.addEventListener('mousedown', start);
+                btn.addEventListener('touchstart', start);
+                btn.addEventListener('mouseup', stop);
+                btn.addEventListener('mouseleave', stop);
+                btn.addEventListener('touchend', stop);
             }
         });
     }

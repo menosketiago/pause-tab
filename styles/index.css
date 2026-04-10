@@ -1,8 +1,34 @@
+/* FONT IMPORT */
+
+@font-face {
+    font-family: 'Nunito';
+    /* Assuming styles/index.css and fonts/ are in the root */
+    src: url('../fonts/Nunito-VariableFont_wght.ttf') format('truetype');
+    font-weight: 200 1000;
+    font-style: normal;
+}
+
+/* VARIABLES */
+
 :root {
+    /* Pastel Dreamland Adventure */
+    --color-thistle: #cdb4dbff;
+    --color-pastel-petal: #ffc8ddff;
+    --color-baby-pink: #ffafccff;
+    --color-icy-blue: #bde0feff;
+    --color-sky-blue: #a2d2ffff;
+
     /* Colors */
     --color-bg: #222222;
     --color-text: #f5f5f5;
-    --color-overlay-bg: rgba(0, 0, 0, 0.5);
+    --color-accent: var(--color-sky-blue);
+
+    --color-overlay-bg: rgba(0, 0, 0, 0.6);
+
+    --color-btn-primary-bg: var(--color-accent);
+    --color-btn-primary-text: var(--color-bg);
+    --color-btn-secondary-bg: color-mix(in hsl, var(--color-btn-primary-bg) 15%, transparent);
+    --color-btn-secondary-text: var(--color-text);
 
     /* Sizes */
     --space-tiny: 4px;
@@ -16,22 +42,35 @@
     --radius-default: var(--space-small);
     --radius-large: var(--space-extra);
     --radius-round: 9999px;
+
+    /* Typography */
+    /* Minor second scale */
+    --font-family: 'Nunito', sans-serif !important;
+
+    /* Speeds */
+    --speed-default: 0.2s;
+    --speed-slow: 0.4s;
+    --speed-slowest: 0.8s;
+    --speed-pulse: 1s;
 }
+
+/* MODAL STYLES */
 
 #pause-tab-modal {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: var(--color-bg);
-    color: var(--color-text);
-    font-family: Roboto, Helvetica, Arial, sans-serif;
-    display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    width: 100vw;
+    height: 100vh;
     padding: var(--space-large);
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-family);
+    font-size: 16px;
+    display: flex;
 
     *,
     *:before,
@@ -46,31 +85,66 @@
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: var(--color-overlay-bg);
-    z-index: 9999999;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--color-overlay-bg);
     color: var(--color-text);
-    font-family: Roboto, Helvetica, Arial, sans-serif;
+    font-family: var(--font-family);
     font-size: 16px;
     backdrop-filter: blur(12px);
+    z-index: 9999999;
+    pointer-events: all !important;
 
     button {
         padding: var(--space-small) var(--space-large);
+        background-color: var(--color-btn-secondary-bg);
+        color: var(--color-btn-secondary-text);
+        font-size: 1.1em;
         font-weight: 600;
+        border: none;
         border-radius: calc(var(--radius-large) - var(--space-large));
+        transition: all var(--speed-slow) ease;
 
         @supports(corner-shape: squircle) {
             corner-shape: squircle;
         }
 
-        &.primary {
+        @keyframes pulse-holding {
+            0% {
+                background-color: var(--color-thistle);
+            }
+
+            50% {
+                background-color: var(--color-accent);
+            }
+
+            100% {
+                background-color: var(--color-thistle);
+            }
+        }
+
+        &:hover {
             background-color: var(--color-text);
-            color: var(--color-bg);
+            color: var(--color-btn-primary-text);
+            font-weight: 700;
+        }
+
+        &.primary {
+            background-color: var(--color-btn-primary-bg);
+            color: var(--color-btn-primary-text);
+            font-weight: 700;
+
+            &:hover {
+                background-color: var(--color-thistle);
+            }
+
+            &.is-holding {
+                animation: pulse var(--speed-pulse) infinite;
+            }
         }
     }
 
@@ -92,12 +166,30 @@
         h1 {
             margin: 0;
             margin-bottom: var(--space-large);
-            font-size: 1.2em;
-            font-weight: 600;
+            font-size: 1.476em;
+            font-weight: 700;
+            line-height: 120%;
             text-box-trim: trim-both;
         }
 
+        p {
+            margin-bottom: var(--space-base);
+            line-height: 140%;
+            text-align: center;
+            text-wrap: pretty;
+            text-box-trim: trim-both;
+
+            &:last-of-type {
+                margin-bottom: var(--space-small);
+            }
+        }
+
         footer {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: var(--space-small);
             width: 100%;
             margin-top: var(--space-large);
 

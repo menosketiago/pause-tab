@@ -17,5 +17,16 @@
     },
     "host_permissions": [
         "<all_urls>"
+    ],
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "fonts/*.ttf",
+                "styles/index.css"
+            ],
+            "matches": [
+                "<all_urls>"
+            ]
+        }
     ]
 }
