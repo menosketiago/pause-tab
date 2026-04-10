@@ -106,7 +106,7 @@
     font-family: var(--font-family);
     font-size: 16px;
     backdrop-filter: blur(12px);
-    z-index: 9999999;
+    z-index: 2147483647;
     pointer-events: all !important;
 
     button {
