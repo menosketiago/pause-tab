@@ -51,7 +51,17 @@
     --speed-default: 0.2s;
     --speed-slow: 0.4s;
     --speed-slowest: 0.8s;
-    --speed-pulse: 1s;
+    --speed-pulse: 5s;
+}
+
+/* ANIMATION */
+
+@keyframes holding-pulse {
+    0% { background-color: var(--color-thistle) !important; }
+    25% { background-color: var(--color-pastel-petal) !important; }
+    50% { background-color: var(--color-baby-pink) !important; }
+    75% { background-color: var(--color-icy-blue) !important; }
+    100% { background-color: var(--color-sky-blue) !important; }
 }
 
 /* MODAL STYLES */
@@ -107,30 +117,20 @@
         font-weight: 600;
         border: none;
         border-radius: calc(var(--radius-large) - var(--space-large));
-        transition: all var(--speed-slow) ease;
+        transition: all var(--speed-default) ease;
 
         @supports(corner-shape: squircle) {
             corner-shape: squircle;
-        }
-
-        @keyframes pulse-holding {
-            0% {
-                background-color: var(--color-thistle);
-            }
-
-            50% {
-                background-color: var(--color-accent);
-            }
-
-            100% {
-                background-color: var(--color-thistle);
-            }
         }
 
         &:hover {
             background-color: var(--color-text);
             color: var(--color-btn-primary-text);
             font-weight: 700;
+        }
+
+        &:active {
+            scale: .95;
         }
 
         &.primary {
@@ -141,10 +141,11 @@
             &:hover {
                 background-color: var(--color-thistle);
             }
+        }
 
-            &.is-holding {
-                animation: pulse var(--speed-pulse) infinite;
-            }
+        &.is-holding {
+            transition: none !important;
+            animation: holding-pulse var(--speed-pulse) infinite;
         }
     }
 

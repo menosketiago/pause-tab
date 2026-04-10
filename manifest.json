@@ -1,10 +1,9 @@
 {
-    "name": "Pause tab",
-    "description": "Pause a tab at any time or set up time limits for tabs.",
-    "version": "0.1",
+    "name": "Pause Tab",
+    "description": "Pause a tab at will or set time limits per tab.",
+    "version": "0.1.0",
     "manifest_version": 3,
     "action": {
-        "default_popup": "popup/index.html",
         "default_icon": "icon_default.png"
     },
     "permissions": [
