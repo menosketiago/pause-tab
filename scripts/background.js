@@ -1,10 +1,10 @@
-// FUNCTION TO INJECT THE MODAL
-
 const injectPauseModal = (tab) => {
+    if (!tab || !tab.id || tab.url.startsWith('chrome://')) return;
+
     chrome.scripting.insertCSS({
         target: { tabId: tab.id },
         files: ["styles/index.css"]
-    });
+    }).catch(err => console.error("CSS Injection failed:", err));
 
     chrome.scripting.executeScript({
         target: { tabId: tab.id },
@@ -61,10 +61,10 @@ const injectPauseModal = (tab) => {
             btn.addEventListener('mouseleave', stop);
             btn.addEventListener('touchend', stop);
         }
-    });
+    }).catch(err => console.error("Script Injection failed:", err));
 };
 
-// CREATE THE CHROME CONTEXT MENU ITEM
+// INITIALIZE
 
 chrome.runtime.onInstalled.addListener(() => {
     chrome.contextMenus.create({
@@ -74,7 +74,7 @@ chrome.runtime.onInstalled.addListener(() => {
     });
 });
 
-// TRIGGER 1: CONTEXT MENU CLICK
+// LISTENERS
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
     if (info.menuItemId === "pause-this-tab") {
@@ -82,8 +82,6 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     }
 });
 
-// TRIGGER 2: EXTENSION ICON CLICK
-
-chrome.action.onClicked.addListener((tab) => {
+chrome.action?.onClicked.addListener((tab) => {
     injectPauseModal(tab);
 });
