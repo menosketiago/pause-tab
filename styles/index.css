@@ -110,6 +110,10 @@
     z-index: 2147483647;
     pointer-events: all !important;
 
+    &:focus-visible {
+        outline: 0;
+    }
+
     button {
         padding: var(--space-small) var(--space-large);
         background-color: var(--color-btn-secondary-bg);
@@ -135,7 +139,7 @@
         }
 
         &:focus-visible {
-            outline: 2px dashed var(--color-text);
+            outline: 1px dashed var(--color-text);
             outline-offset: var(--space-tiny);
         }
 
