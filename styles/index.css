@@ -118,8 +118,9 @@
         padding: var(--space-small) var(--space-large);
         background-color: var(--color-btn-secondary-bg);
         color: var(--color-btn-secondary-text);
+        font-family: inherit;
         font-size: 1.1em;
-        font-weight: 600;
+        font-weight: 700;
         border: none;
         border-radius: calc(var(--radius-large) - var(--space-large));
         transition: all var(--speed-default) ease;
@@ -131,7 +132,7 @@
         &:hover {
             background-color: var(--color-text);
             color: var(--color-btn-primary-text);
-            font-weight: 700;
+            font-weight: 800;
         }
 
         &:active {
@@ -146,7 +147,7 @@
         &.primary {
             background-color: var(--color-btn-primary-bg);
             color: var(--color-btn-primary-text);
-            font-weight: 700;
+            font-weight: 800;
 
             &:hover {
                 background-color: var(--color-thistle);
@@ -168,6 +169,8 @@
         width: 360px;
         padding: var(--space-large);
         background-color: var(--color-bg);
+        background: linear-gradient(340deg, hsl(from var(--color-bg) h s 0.12 / 1) -120%, var(--color-bg));
+        border: 1px solid hsl(from var(--color-bg) h s 20 / 0.8);
         border-radius: var(--radius-large);
 
         @supports(corner-shape: squircle) {
@@ -176,7 +179,9 @@
 
         h1 {
             margin: 0;
-            margin-bottom: var(--space-large);
+            margin-bottom: var(--space-base);
+            color: inherit;
+            font-family: inherit;
             font-size: 1.476em;
             font-weight: 700;
             line-height: 120%;
@@ -185,6 +190,7 @@
 
         p {
             margin-bottom: var(--space-base);
+            font-family: inherit;
             line-height: 140%;
             text-align: center;
             text-wrap: pretty;
