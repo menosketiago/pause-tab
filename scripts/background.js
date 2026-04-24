@@ -165,15 +165,15 @@ const injectTimeTracking = (tab) => {
                         if (favIconUrl && typeof favIconUrl === 'string') {
                             content = `<img src="${favIconUrl}" />`;
                         }
-                        content += `<span>${Math.floor(time / 60)}m spent on this tab today</span>`;
+                        content += `<span>${Math.floor(time / 60)}m spent on this tab</span>`;
                         
                         toast.innerHTML = content;
                         container.appendChild(toast);
                         document.body.appendChild(container);
                         
-                        // setTimeout(() => {
-                        //     if (container && container.parentNode) container.remove();
-                        // }, 4000);
+                        setTimeout(() => {
+                            if (container && container.parentNode) container.remove();
+                        }, 3600);
                     }
                 });
             }, 1000);
