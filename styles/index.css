@@ -220,6 +220,7 @@
     font-size: var(--font-size-base) !important;
     font-weight: 700 !important;
     white-space: nowrap !important;
+    cursor: pointer !important;
     
     /* Content sits above the container's glow */
     z-index: 1 !important;
