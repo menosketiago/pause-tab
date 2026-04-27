@@ -162,23 +162,25 @@ const injectTimeTracking = (tab) => {
                         toast.id = 'pause-tab-toast';
                         
                         let content = '';
+
                         if (favIconUrl && typeof favIconUrl === 'string') {
                             content = `<img src="${favIconUrl}" />`;
                         }
-                        content += `<span>${Math.floor(time / 60)}m spent on this tab</span>`;
+
+                        content += `<span>Tab used for ${Math.floor(time / 60)} minutes</span>`;
                         
                         toast.innerHTML = content;
                         container.appendChild(toast);
                         document.body.appendChild(container);
                         
+                        setTimeout(() => {
+                            if (container && container.parentNode) container.remove();
+                        }, 7200);
+
                         // Dismiss on click
                         container.addEventListener('click', () => {
                             if (container && container.parentNode) container.remove();
                         });
-                        
-                        setTimeout(() => {
-                            if (container && container.parentNode) container.remove();
-                        }, 3600);
                     }
                 });
             }, 1000);

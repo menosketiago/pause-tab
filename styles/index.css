@@ -38,7 +38,8 @@
 
     /* Radii */
     --radius-default: 8px;
-    --radius-large: 24px;
+    --radius-large: cacl(var(--radius-default) * 3);
+    --radius-extra: calc(var(--radius-default) * 6);
     --radius-round: 9999px;
 
     /* Typography */
@@ -173,7 +174,7 @@
 
 #pause-tab-toast-container {
     position: fixed !important;
-    top: var(--space-large) !important;
+    top: var(--space-extra) !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
     z-index: 2147483647 !important; /* Max z-index */
@@ -202,8 +203,8 @@
             var(--color-sky-blue)
         ) !important;
         
-        filter: blur(12px) !important;
-        opacity: 0.8 !important;
+        filter: blur(24px) !important;
+        opacity: 1 !important;
     }
 }
 
@@ -212,23 +213,33 @@
     display: flex !important;
     align-items: center !important;
     padding: var(--space-large) !important;
+    padding-right: calc(var(--space-extra) + var(--space-tiny));
     background-color: var(--color-bg) !important;
     background: linear-gradient(to right, hsl(from var(--color-bg) h s 20), var(--color-bg)) !important;
     color: var(--color-text) !important;
-    border-radius: var(--radius-round) !important;
+    border-radius: var(--radius-extra) !important;
     font-family: var(--font-family) !important;
     font-size: var(--font-size-base) !important;
     font-weight: 700 !important;
     white-space: nowrap !important;
     cursor: pointer !important;
-    
+
     /* Content sits above the container's glow */
     z-index: 1 !important;
+
+    @supports(corner-shape: squircle) {
+        corner-shape: squircle;
+    }
 
     img {
         width: var(--space-large) !important;
         height: var(--space-large) !important;
         margin-right: var(--space-base) !important;
+        border-radius: calc(var(--radius-extra) - var(--space-large)) !important;
+
+        @supports(corner-shape: squircle) {
+            corner-shape: squircle;
+        }
     }
 }
 
