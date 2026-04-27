@@ -182,11 +182,10 @@
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
+    animation: show-toast var(--speed-slow) ease-out forwards !important;
     
     /* Creates a new stacking context so ::before stays behind the content */
     isolation: isolate !important;
-    
-    animation: show-toast var(--speed-slow) ease-out forwards !important;
 
     &::before {
         content: '' !important;
@@ -213,7 +212,6 @@
     display: flex !important;
     align-items: center !important;
     padding: var(--space-large) !important;
-    padding-right: calc(var(--space-extra) + var(--space-tiny));
     background-color: var(--color-bg) !important;
     background: linear-gradient(to right, hsl(from var(--color-bg) h s 20), var(--color-bg)) !important;
     color: var(--color-text) !important;
@@ -222,6 +220,7 @@
     font-size: var(--font-size-base) !important;
     font-weight: 700 !important;
     white-space: nowrap !important;
+    pointer-events: all !important;
     cursor: pointer !important;
 
     /* Content sits above the container's glow */

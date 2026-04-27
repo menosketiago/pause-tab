@@ -167,7 +167,7 @@ const injectTimeTracking = (tab) => {
                             content = `<img src="${favIconUrl}" />`;
                         }
 
-                        content += `<span>Tab used for ${Math.floor(time / 60)} minutes</span>`;
+                        content += `<span>Tab used for ${Math.floor(time / 60)}m</span>`;
                         
                         toast.innerHTML = content;
                         container.appendChild(toast);
@@ -209,17 +209,21 @@ const updateActiveTab = async () => {
 const startGlobalTimer = () => {
     setInterval(async () => {
         if (!activeTabId) return;
+
         const res = await chrome.storage.local.get([STORAGE_KEYS.TIME, STORAGE_KEYS.PAUSED, STORAGE_KEYS.DATE]);
         
         if (res[STORAGE_KEYS.DATE] !== getLocalDate()) {
             await chrome.storage.local.set({ [STORAGE_KEYS.TIME]: {}, [STORAGE_KEYS.DATE]: getLocalDate() });
+
             return;
         }
 
         const tabKey = `tab_${activeTabId}`;
+
         if (!res[STORAGE_KEYS.PAUSED]?.[tabKey]) {
             const timeData = res[STORAGE_KEYS.TIME] || {};
             timeData[tabKey] = (timeData[tabKey] || 0) + 1;
+
             chrome.storage.local.set({ [STORAGE_KEYS.TIME]: timeData });
         }
     }, 1000);
@@ -233,11 +237,13 @@ chrome.runtime.onInstalled.addListener(async () => {
         title: "Pause this tab", 
         contexts: ["page"] 
     });
+
     await chrome.storage.local.set({ 
         [STORAGE_KEYS.TIME]: {}, 
         [STORAGE_KEYS.DATE]: getLocalDate(), 
         [STORAGE_KEYS.PAUSED]: {} 
     });
+
     updateActiveTab();
 });
 
