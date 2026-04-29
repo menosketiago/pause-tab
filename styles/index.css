@@ -51,6 +51,9 @@
     --speed-default: 0.2s;
     --speed-slow: 0.4s;
     --speed-pulse: 5s;
+
+    /* Blur */
+    --blur-radius: var(--space-large);
 }
 
 /* REUSABLE COMPONENTS */
@@ -192,7 +195,7 @@
         position: absolute !important;
         inset: -4px !important; 
         z-index: -1 !important; /* Strictly behind the toast content */
-        border-radius: var(--radius-round) !important;
+        border-radius: calc(var(--radius-extra) - var(--space-large)) !important;
         
         background: linear-gradient(to right, 
             var(--color-thistle), 
@@ -202,7 +205,7 @@
             var(--color-sky-blue)
         ) !important;
         
-        filter: blur(24px) !important;
+        filter: blur(var(--blur-radius)) !important;
         opacity: 1 !important;
     }
 }

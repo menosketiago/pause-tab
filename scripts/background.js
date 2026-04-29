@@ -175,7 +175,7 @@ const injectTimeTracking = (tab) => {
                         
                         setTimeout(() => {
                             if (container && container.parentNode) container.remove();
-                        }, 7200);
+                        }, 12000);
 
                         // Dismiss on click
                         container.addEventListener('click', () => {
