@@ -167,11 +167,11 @@ const injectTimeTracking = (tab) => {
                         
                         if (!document.body) return;
 
-                        // Create Container for Glow isolation
+                        // Create Container for the glow
                         container = document.createElement('div');
                         container.id = 'pause-tab-toast-container';
 
-                        // Create actual Toast content
+                        // Create the actual toast
                         toast = document.createElement('div');
                         toast.id = 'pause-tab-toast';
                         
@@ -181,7 +181,7 @@ const injectTimeTracking = (tab) => {
                             content = `<img src="${favIconUrl}" />`;
                         }
 
-                        content += `<span>${domain} used for ${Math.floor(time / 60)}m</span>`;
+                        content += `<span>Used for ${Math.floor(time / 60)}m</span>`;
                         
                         toast.innerHTML = content;
                         container.appendChild(toast);
