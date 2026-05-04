@@ -1,8 +1,8 @@
 /* FONT IMPORT */
 
 @font-face {
-    font-family: 'Nunito';
-    src: url('../fonts/Nunito-VariableFont_wght.ttf') format('truetype');
+    font-family: "Nunito";
+    src: url("../fonts/Nunito-VariableFont_wght.ttf") format("truetype");
     font-weight: 200 1000;
     font-style: normal;
 }
@@ -26,8 +26,14 @@
 
     --color-btn-primary-bg: var(--color-accent);
     --color-btn-primary-text: var(--color-bg);
-    --color-btn-secondary-bg: color-mix(in hsl, var(--color-btn-primary-bg) 15%, transparent);
+    --color-btn-secondary-bg: color-mix(
+        in hsl,
+        var(--color-btn-primary-bg) 15%,
+        transparent
+    );
     --color-btn-secondary-text: var(--color-text);
+    --color-btn-destructive-bg: var(--color-baby-pink);
+    --color-btn-destructive-text: var(--color-bg);
 
     /* Sizes */
     --space-tiny: 4px;
@@ -43,7 +49,7 @@
     --radius-round: 9999px;
 
     /* Typography */
-    --font-family: 'Nunito', sans-serif;
+    --font-family: "Nunito", sans-serif;
     --font-size-base: 16px;
     --font-size-large: 1.25em;
 
@@ -75,7 +81,7 @@
     cursor: pointer !important;
     transition: all var(--speed-default) ease !important;
 
-    @supports(corner-shape: squircle) {
+    @supports (corner-shape: squircle) {
         corner-shape: squircle;
     }
 
@@ -100,6 +106,20 @@
 
         &:hover {
             background-color: var(--color-thistle) !important;
+        }
+    }
+
+    &.destructive {
+        background-color: var(--color-btn-destructive-bg) !important;
+        color: var(--color-btn-destructive-text) !important;
+        font-weight: 800 !important;
+
+        &:hover {
+            background-color: color-mix(
+                in hsl,
+                var(--color-btn-destructive-bg) 88%,
+                var(--color-bg)
+            ) !important;
         }
     }
 
@@ -137,12 +157,16 @@
         width: 360px !important;
         padding: var(--space-large) !important;
         background-color: var(--color-bg) !important;
-        background: linear-gradient(340deg, hsl(from var(--color-bg) h s 0.12) -120%, var(--color-bg)) !important;
+        background: linear-gradient(
+            340deg,
+            hsl(from var(--color-bg) h s 0.12) -120%,
+            var(--color-bg)
+        ) !important;
         border: 1px solid hsl(from var(--color-bg) h s 20 / 0.8) !important;
         border-radius: var(--radius-large) !important;
         text-align: center !important;
 
-        @supports(corner-shape: squircle) {
+        @supports (corner-shape: squircle) {
             corner-shape: squircle;
         }
 
@@ -186,25 +210,28 @@
     align-items: center !important;
     justify-content: center !important;
     animation: show-toast var(--speed-slow) ease-out forwards !important;
-    
+
     /* Creates a new stacking context so ::before stays behind the content */
     isolation: isolate !important;
 
     &::before {
-        content: '' !important;
+        content: "" !important;
         position: absolute !important;
-        inset: -4px !important; 
+        inset: -4px !important;
         z-index: -1 !important; /* Strictly behind the toast content */
-        border-radius: calc(var(--radius-extra) - var(--space-large)) !important;
-        
-        background: linear-gradient(to right, 
-            var(--color-thistle), 
-            var(--color-pastel-petal), 
-            var(--color-baby-pink), 
-            var(--color-icy-blue), 
+        border-radius: calc(
+            var(--radius-extra) - var(--space-large)
+        ) !important;
+
+        background: linear-gradient(
+            to right,
+            var(--color-thistle),
+            var(--color-pastel-petal),
+            var(--color-baby-pink),
+            var(--color-icy-blue),
             var(--color-sky-blue)
         ) !important;
-        
+
         filter: blur(var(--blur-radius)) !important;
         opacity: 1 !important;
     }
@@ -216,7 +243,11 @@
     align-items: center !important;
     padding: var(--space-large) !important;
     background-color: var(--color-bg) !important;
-    background: linear-gradient(to right, hsl(from var(--color-bg) h s 20), var(--color-bg)) !important;
+    background: linear-gradient(
+        to right,
+        hsl(from var(--color-bg) h s 20),
+        var(--color-bg)
+    ) !important;
     color: var(--color-text) !important;
     border-radius: var(--radius-extra) !important;
     font-family: var(--font-family) !important;
@@ -229,7 +260,7 @@
     /* Content sits above the container's glow */
     z-index: 1 !important;
 
-    @supports(corner-shape: squircle) {
+    @supports (corner-shape: squircle) {
         corner-shape: squircle;
     }
 
@@ -237,10 +268,56 @@
         width: var(--space-large) !important;
         height: var(--space-large) !important;
         margin-right: var(--space-base) !important;
-        border-radius: calc(var(--radius-extra) - var(--space-large)) !important;
+        border-radius: calc(
+            var(--radius-extra) - var(--space-large)
+        ) !important;
 
-        @supports(corner-shape: squircle) {
+        @supports (corner-shape: squircle) {
             corner-shape: squircle;
+        }
+    }
+}
+
+/* EXTENSION POPUP */
+
+#pause-tab-popup {
+    width: calc(var(--space-base) * 30);
+    padding: var(--space-large);
+    background-color: var(--color-bg);
+    background: linear-gradient(
+        to right,
+        hsl(from var(--color-bg) h s 20),
+        var(--color-bg)
+    );
+    color: var(--color-text);
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    font-weight: 500;
+
+    section {
+        padding-bottom: var(--space-large);
+
+        &:last-of-type {
+            margin-bottom: 0;
+        }
+    }
+
+    .blacklist-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: var(--space-small);
+
+        &:last-of-type {
+            margin-bottom: 0;
+        }
+
+        > span {
+            flex: 1;
+        }
+
+        .pause-tab-btn {
+            max-width: calc(var(--space-base) * 10);
+            width: auto;
         }
     }
 }
@@ -248,20 +325,30 @@
 /* ANIMATIONS */
 
 @keyframes holding-pulse {
-    0%   { background-color: var(--color-thistle) !important; }
-    25%  { background-color: var(--color-pastel-petal) !important; }
-    50%  { background-color: var(--color-baby-pink) !important; }
-    75%  { background-color: var(--color-icy-blue) !important; }
-    100% { background-color: var(--color-sky-blue) !important; }
+    0% {
+        background-color: var(--color-thistle) !important;
+    }
+    25% {
+        background-color: var(--color-pastel-petal) !important;
+    }
+    50% {
+        background-color: var(--color-baby-pink) !important;
+    }
+    75% {
+        background-color: var(--color-icy-blue) !important;
+    }
+    100% {
+        background-color: var(--color-sky-blue) !important;
+    }
 }
 
 @keyframes show-toast {
-    from { 
-        transform: translateX(-50%) translateY(-120%) !important; 
-        opacity: 0 !important; 
+    from {
+        transform: translateX(-50%) translateY(-120%) !important;
+        opacity: 0 !important;
     }
-    to { 
-        transform: translateX(-50%) translateY(0) !important; 
-        opacity: 1 !important; 
+    to {
+        transform: translateX(-50%) translateY(0) !important;
+        opacity: 1 !important;
     }
 }

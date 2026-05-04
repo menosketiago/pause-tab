@@ -1,0 +1,45 @@
+<!doctype html>
+<html id="pause-tab-popup">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Pause Tab Settings</title>
+
+        <link rel="stylesheet" href="../styles/index.css" />
+    </head>
+    <body>
+        <div id="message"></div>
+
+        <section>
+            <h2>Untracked domains</h2>
+
+            <div class="blacklist-list" id="blacklistContainer">
+                <div class="empty-state">No domains blacklisted</div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Add a new untracked domain</h2>
+
+            <div class="input-group">
+                <input
+                    type="text"
+                    id="domainInput"
+                    placeholder="example.com"
+                    autocomplete="off"
+                />
+                <button class="pause-tab-btn primary" id="addBtn">Add</button>
+            </div>
+        </section>
+
+        <section>
+            <div class="action-buttons">
+                <button class="pause-tab-btn destructive" id="clearAllBtn">
+                    Clear All
+                </button>
+            </div>
+        </section>
+
+        <script src="../scripts/popup.js"></script>
+    </body>
+</html>
