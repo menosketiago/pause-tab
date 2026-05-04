@@ -161,7 +161,7 @@ const injectTimeTracking = (tab) => {
                     time = timeTracking[`domain_${domain}`] || 0;
 
                     // Trigger toast every 15 minutes (900 seconds)
-                    if (time > 0 && time % 10 === 0) {
+                    if (time > 0 && time % 900 === 0) {
                         toastContainer = document.getElementById('pause-tab-toast-container');
                         if (toastContainer) return;
                         
