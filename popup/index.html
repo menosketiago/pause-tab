@@ -13,29 +13,27 @@
         <section>
             <h2>Untracked domains</h2>
 
-            <div class="blacklist-list" id="blacklistContainer">
+            <div class="blacklist-list" id="container-blacklist">
                 <div class="empty-state">No domains blacklisted</div>
             </div>
+
+            <button class="pause-tab-btn destructive" id="btn-clear-all">
+                Remove all domains
+            </button>
         </section>
 
         <section>
-            <h2>Add a new untracked domain</h2>
+            <h2>Add untracked domain</h2>
 
-            <div class="input-group">
+            <div class="add-domain">
                 <input
                     type="text"
-                    id="domainInput"
+                    id="input-add-domain"
                     placeholder="example.com"
                     autocomplete="off"
                 />
-                <button class="pause-tab-btn primary" id="addBtn">Add</button>
-            </div>
-        </section>
-
-        <section>
-            <div class="action-buttons">
-                <button class="pause-tab-btn destructive" id="clearAllBtn">
-                    Clear All
+                <button class="pause-tab-btn primary" id="btn-add-domain">
+                    Add
                 </button>
             </div>
         </section>

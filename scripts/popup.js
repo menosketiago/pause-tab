@@ -2,10 +2,10 @@ const STORAGE_KEYS = {
   BLACKLIST: "blacklistedDomains",
 };
 
-const blacklistContainer = document.getElementById("blacklistContainer");
-const domainInput = document.getElementById("domainInput");
-const addBtn = document.getElementById("addBtn");
-const clearAllBtn = document.getElementById("clearAllBtn");
+const blacklistContainer = document.getElementById("container-blacklist");
+const domainInput = document.getElementById("input-add-domain");
+const addBtn = document.getElementById("btn-add-domain");
+const clearAllBtn = document.getElementById("btn-clear-all");
 const messageEl = document.getElementById("message");
 
 const normalizeDomain = (domain) => {
@@ -21,7 +21,7 @@ const showMessage = (text, type = "success") => {
   messageEl.style.display = "block";
   setTimeout(() => {
     messageEl.style.display = "none";
-  }, 3000);
+  }, 12000);
 };
 
 const loadBlacklist = async () => {
@@ -48,6 +48,7 @@ const loadBlacklist = async () => {
                 <span>${domain}</span>
                 <button id="item-remove" class="pause-tab-btn destructive" data-domain="${domain}">Remove</button>
             `;
+
       blacklistContainer.appendChild(item);
     });
 
@@ -103,9 +104,11 @@ const clearAll = () => {
 
 // Event listeners
 addBtn.addEventListener("click", addToBlacklist);
+
 domainInput.addEventListener("keypress", (e) => {
   if (e.key === "Enter") addToBlacklist();
 });
+
 clearAllBtn.addEventListener("click", clearAll);
 
 // Load blacklist on popup open
