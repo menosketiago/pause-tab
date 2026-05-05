@@ -81,10 +81,11 @@ const removeFromBlacklist = (domain) => {
 };
 
 const clearAll = () => {
-    if (confirm("Are you sure you want to clear all blacklisted domains?")) {
+    if (confirm("Are you sure you want to clear all untracked sites?")) {
         chrome.storage.local.set({ [STORAGE_KEYS.BLACKLIST]: {} }, () => {
-            showMessage("All domains cleared");
+            showMessage("Tracking everything again ⏱️", "success");
             loadBlacklist();
+            updateTrackingBtn();
         });
     }
 };

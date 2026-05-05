@@ -413,7 +413,11 @@
         }
 
         &.success {
-            background-color: color-mix(in hsl, var(--color-mint) 12%, transparent);
+            background-color: color-mix(in hsl, var(--color-mint) 24%, transparent);
+        }
+
+        &.error {
+            background-color: color-mix(in hsl, var(--color-baby-pink) 24%, transparent);
         }
     }
 
