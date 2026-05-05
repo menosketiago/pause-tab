@@ -332,7 +332,7 @@
 
             &:last-of-type,
             &:last-child,
-            &:has(+ .pause-tab-btn.hidden) {
+            &:has(+ .pause-tab-btn.hidden):not(:has(~ .pause-tab-btn:not(.hidden))) {
                 margin-bottom: 0;
             }
         }
@@ -360,6 +360,10 @@
 
         .blacklist-list {
             margin-bottom: var(--space-medium);
+
+            &:has(+ .hidden) {
+                margin-bottom: 0;
+            }
 
             .empty-state {
                 color: color-mix(in hsl, var(--color-text) 80%, var(--color-bg));
