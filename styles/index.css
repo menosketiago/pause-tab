@@ -20,6 +20,8 @@
     --color-icy-blue: #bde0fe;
     --color-sky-blue: #a2d2ff;
 
+    --color-mint: #b5ead7;
+    
     /* Sizes */
     --space-tiny: 4px;
     --space-small: 8px;
@@ -328,7 +330,9 @@
         .pause-tab-btn {
             margin-bottom: var(--space-medium);
 
-            &:last-of-type {
+            &:last-of-type,
+            &:last-child,
+            &:has(+ .pause-tab-btn.hidden) {
                 margin-bottom: 0;
             }
         }
@@ -392,16 +396,20 @@
         #btn-clear-all {
             margin-top: var(--space-large);
         }
+    }
 
-        .message {
-            padding: var(--space-large);
-            margin-top: var(--space-large);
-            background-color: color-mix(in hsl, var(--color-text) 12%, transparent);
-            border-radius: var(--space-small);
+    .message {
+        padding: var(--space-large);
+        margin-top: var(--space-large);
+        background-color: color-mix(in hsl, var(--color-text) 12%, transparent);
+        border-radius: var(--space-small);
 
-            @supports (corner-shape: squircle) {
-                corner-shape: squircle;
-            }
+        @supports (corner-shape: squircle) {
+            corner-shape: squircle;
+        }
+
+        &.success {
+            background-color: color-mix(in hsl, var(--color-mint) 12%, transparent);
         }
     }
 

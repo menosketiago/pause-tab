@@ -24,7 +24,7 @@ const updateTrackingBtn = () => {
 };
 
 const showMessage = (text, type = "success") => {
-    messageEl.textContent = text;
+    messageEl.innerHTML = text;
     messageEl.className = `message ${type}`;
     messageEl.style.display = "block";
     setTimeout(() => {
@@ -73,7 +73,7 @@ const removeFromBlacklist = (domain) => {
         { type: "removeFromBlacklist", domain },
         (response) => {
             if (response?.success) {
-                showMessage(`${domain} is now being tracked again ⏱️`, "success");
+                showMessage(`<strong>${domain}</strong> is now being tracked ⏱️`, "success");
                 loadBlacklist();
             }
         },
