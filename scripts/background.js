@@ -33,7 +33,6 @@ const injectPauseModal = (tab) => {
             );
             const styleBlock = document.createElement("style");
             const overlay = document.createElement("div");
-            const btn = document.getElementById("resume-button");
 
             let timer, interval, remaining;
 
@@ -127,6 +126,8 @@ const injectPauseModal = (tab) => {
             `;
             document.body.appendChild(overlay);
             overlay.focus();
+
+            const btn = overlay.querySelector("#resume-button");
 
             btn.addEventListener("mousedown", start);
             btn.addEventListener("touchstart", start);
@@ -255,7 +256,7 @@ const getDomain = (url) => {
     if (!url) return null;
 
     try {
-        return new URL(url).hostname;
+        return new URL(url).hostname.replace(/^www\./, "");
     } catch {
         return null;
     }
@@ -332,13 +333,25 @@ chrome.runtime.onInstalled.addListener(async () => {
 
     chrome.contextMenus.create({
         id: "ignore-domain",
-        title: "Don't time track this site",
+        title: "Don't track time on this site",
+        contexts: ["page"],
+    });
+
+    chrome.contextMenus.create({
+        id: "track-domain",
+        title: "Track time on this site",
         contexts: ["page"],
     });
 
     chrome.contextMenus.create({
         id: "ignore-domain-action",
-        title: "Don't time track this site",
+        title: "Don't track time on this site",
+        contexts: ["action"],
+    });
+
+    chrome.contextMenus.create({
+        id: "track-domain-action",
+        title: "Track time on this site",
         contexts: ["action"],
     });
 
@@ -354,11 +367,23 @@ chrome.runtime.onInstalled.addListener(async () => {
 
 // EVENT LISTENERS
 
+const updateContextMenus = async (domain) => {
+    const domainKey = `domain_${domain}`;
+    const res = await chrome.storage.local.get([STORAGE_KEYS.BLACKLIST]);
+    const isBlacklisted = !!(res[STORAGE_KEYS.BLACKLIST] || {})[domainKey];
+
+    chrome.contextMenus.update("ignore-domain", { visible: !isBlacklisted });
+    chrome.contextMenus.update("ignore-domain-action", { visible: !isBlacklisted });
+    chrome.contextMenus.update("track-domain", { visible: isBlacklisted });
+    chrome.contextMenus.update("track-domain-action", { visible: isBlacklisted });
+};
+
 chrome.tabs.onActivated.addListener(async (info) => {
     const tab = await chrome.tabs.get(info.tabId);
 
     activeTabId = info.tabId;
     activeDomain = getDomain(tab.url);
+    updateContextMenus(activeDomain);
 });
 
 chrome.windows.onFocusChanged.addListener(async (windowId) => {
@@ -374,6 +399,7 @@ chrome.tabs.onUpdated.addListener((id, change, tab) => {
         chrome.tabs.get(id, (fullTab) => {
             if (chrome.runtime.lastError) return;
             injectTimeTracking(fullTab);
+            if (fullTab.active) updateContextMenus(getDomain(fullTab.url));
         });
     }
 });
@@ -386,6 +412,12 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
         info.menuItemId === "ignore-domain-action"
     ) {
         addDomainToBlacklist(tab);
+    } else if (
+        info.menuItemId === "track-domain" ||
+        info.menuItemId === "track-domain-action"
+    ) {
+        const domain = getDomain(tab.url);
+        if (domain) removeDomainFromBlacklist(domain);
     }
 });
 
@@ -399,7 +431,8 @@ const addDomainToBlacklist = async (tab) => {
 
     blacklist[domainKey] = true;
     await chrome.storage.local.set({ [STORAGE_KEYS.BLACKLIST]: blacklist });
-    chrome.runtime.sendMessage({ type: "blacklistUpdated" }).catch(() => { });
+    chrome.runtime.sendMessage({ type: "blacklistUpdated" }).catch(() => {});
+    updateContextMenus(domain);
 };
 
 const removeDomainFromBlacklist = async (domain) => {
@@ -409,6 +442,8 @@ const removeDomainFromBlacklist = async (domain) => {
 
     delete blacklist[domainKey];
     await chrome.storage.local.set({ [STORAGE_KEYS.BLACKLIST]: blacklist });
+    chrome.runtime.sendMessage({ type: "blacklistUpdated" }).catch(() => {});
+    updateContextMenus(domain);
 };
 
 if (chrome.action) {
@@ -450,6 +485,20 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
             sendResponse({ blacklist: res[STORAGE_KEYS.BLACKLIST] || {} });
         });
         return true;
+    } else if (msg.type === "pauseCurrentTab") {
+        if (activeTabId) {
+            chrome.tabs.get(activeTabId, (tab) => {
+                if (chrome.runtime.lastError) return;
+                injectPauseModal(tab);
+            });
+        }
+    } else if (msg.type === "blacklistCurrentTab") {
+        if (activeTabId) {
+            chrome.tabs.get(activeTabId, (tab) => {
+                if (chrome.runtime.lastError) return;
+                addDomainToBlacklist(tab);
+            });
+        }
     }
 });
 
