@@ -406,6 +406,7 @@
         padding: var(--space-large);
         margin-top: var(--space-large);
         background-color: color-mix(in hsl, var(--color-text) 12%, transparent);
+        text-wrap: pretty;
         border-radius: var(--space-small);
 
         @supports (corner-shape: squircle) {
