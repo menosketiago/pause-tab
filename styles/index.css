@@ -10,6 +10,9 @@
 /* VARIABLES */
 
 :root {
+    --color-black: #222222;
+    --color-white: #f5f5f5;
+
     /* Pastel Dreamland Adventure */
     --color-thistle: #cdb4db;
     --color-pastel-petal: #ffc8dd;
@@ -17,32 +20,14 @@
     --color-icy-blue: #bde0fe;
     --color-sky-blue: #a2d2ff;
 
-    /* Colors */
-    --color-black: #222222;
-    --color-white: #f5f5f5;
-    --color-bg: var(--color-black);
-    --color-text: var(--color-white);
-    --color-accent: var(--color-sky-blue);
-
-    --color-overlay-bg: rgba(0, 0, 0, 0.6);
-
-    --color-btn-primary-bg: var(--color-accent);
-    --color-btn-primary-text: var(--color-bg);
-    --color-btn-secondary-bg: color-mix(
-        in hsl,
-        var(--color-btn-primary-bg) 15%,
-        transparent
-    );
-    --color-btn-secondary-text: var(--color-text);
-    --color-btn-destructive-bg: var(--color-baby-pink);
-    --color-btn-destructive-text: var(--color-bg);
-
     /* Sizes */
     --space-tiny: 4px;
     --space-small: 8px;
-    --space-base: 12px;
+    --space-medium: 12px;
     --space-large: 24px;
     --space-extra: 48px;
+
+    --popup-width: calc(var(--space-medium) * 30);
 
     /* Radii */
     --radius-default: 8px;
@@ -54,6 +39,9 @@
     --font-family: "Nunito", sans-serif;
     --font-size-base: 16px;
     --font-size-large: 1.25em;
+    --font-weight-normal: 500;
+    --font-weight-bold: 700;
+    --font-weight-extra: 800;
 
     /* Speeds */
     --speed-default: 0.2s;
@@ -62,6 +50,29 @@
 
     /* Blur */
     --blur-radius: var(--space-large);
+
+    /* Semantic */
+    --color-bg: var(--color-black);
+    --color-text: var(--color-white);
+    --color-accent: var(--color-sky-blue);
+
+    --color-overlay-bg: color-mix(in hsl, var(--color-bg) 60%, transparent);
+
+    /* Buttons */
+    --btn-color-primary-bg: var(--color-accent);
+    --btn-color-primary-text: var(--color-black);
+
+    --btn-color-secondary-bg: color-mix(
+        in hsl,
+        var(--btn-color-primary-bg) 15%,
+        transparent
+    );
+    --btn-color-secondary-text: var(--color-text);
+
+    --btn-color-destructive-bg: var(--color-baby-pink);
+    --btn-color-destructive-text: var(--color-black);
+
+    --btn-radius: var(--radius-default);
 }
 
 /* REUSABLE COMPONENTS */
@@ -71,15 +82,15 @@
     justify-content: center !important;
     align-items: center !important;
     width: 100% !important;
-    padding: var(--space-base) var(--space-large) !important;
-    background-color: var(--color-btn-secondary-bg) !important;
-    color: var(--color-btn-secondary-text) !important;
+    padding: var(--space-medium) var(--space-large) !important;
+    background-color: var(--btn-color-secondary-bg) !important;
+    color: var(--btn-color-secondary-text) !important;
     font-family: var(--font-family) !important;
     font-size: 1.1em !important;
-    font-weight: 700 !important;
+    font-weight: var(--font-weight-bold) !important;
     line-height: 100% !important;
     border: none !important;
-    border-radius: var(--radius-default) !important;
+    border-radius: var(--btn-radius) !important;
     cursor: pointer !important;
     transition: all var(--speed-default) ease !important;
 
@@ -102,28 +113,26 @@
     }
 
     &.primary {
-        background-color: var(--color-btn-primary-bg) !important;
-        color: var(--color-btn-primary-text) !important;
-        font-weight: 800 !important;
+        background-color: var(--btn-color-primary-bg) !important;
+        color: var(--btn-color-primary-text) !important;
 
         &:hover {
             background-color: color-mix(
                 in hsl,
-                var(--color-btn-primary-bg) 84%,
+                var(--btn-color-primary-bg) 84%,
                 var(--color-bg)
             ) !important;
         }
     }
 
     &.destructive {
-        background-color: var(--color-btn-destructive-bg) !important;
-        color: var(--color-btn-destructive-text) !important;
-        font-weight: 800 !important;
+        background-color: var(--btn-color-destructive-bg) !important;
+        color: var(--btn-color-destructive-text) !important;
 
         &:hover {
             background-color: color-mix(
                 in hsl,
-                var(--color-btn-destructive-bg) 88%,
+                var(--btn-color-destructive-bg) 88%,
                 var(--color-bg)
             ) !important;
         }
@@ -177,14 +186,14 @@
         }
 
         h1 {
-            margin: 0 0 var(--space-base) 0 !important;
+            margin: 0 0 var(--space-medium) 0 !important;
             font-size: 1.5em !important;
-            font-weight: 800 !important;
+            font-weight: var(--font-weight-extra) !important;
             line-height: 120% !important;
         }
 
         p {
-            margin-bottom: var(--space-base) !important;
+            margin-bottom: var(--space-medium) !important;
             line-height: 140% !important;
             text-wrap: pretty !important;
 
@@ -258,7 +267,7 @@
     border-radius: var(--radius-extra) !important;
     font-family: var(--font-family) !important;
     font-size: var(--font-size-base) !important;
-    font-weight: 700 !important;
+    font-weight: var(--font-weight-bold) !important;
     white-space: nowrap !important;
     pointer-events: all !important;
     cursor: pointer !important;
@@ -273,7 +282,7 @@
     img {
         width: var(--space-large) !important;
         height: var(--space-large) !important;
-        margin-right: var(--space-base) !important;
+        margin-right: var(--space-medium) !important;
         border-radius: calc(
             var(--radius-extra) - var(--space-large)
         ) !important;
@@ -287,7 +296,7 @@
 /* EXTENSION POPUP */
 
 #pause-tab-popup {
-    width: calc(var(--space-base) * 30);
+    width: var(--popup-width);
     padding: var(--space-large);
     background-color: var(--color-bg);
     background: linear-gradient(
@@ -298,13 +307,13 @@
     color: var(--color-text);
     font-family: var(--font-family);
     font-size: var(--font-size-base);
-    font-weight: 500;
+    font-weight: var(--font-weight-normal);
 
     h1,
     h2,
     h3 {
         margin: 0;
-        margin-bottom: var(--space-base);
+        margin-bottom: var(--space-medium);
     }
 
     section {
@@ -358,7 +367,7 @@
         }
 
         .pause-tab-btn {
-            max-width: calc(var(--space-base) * 10);
+            max-width: calc(var(--space-medium) * 10);
             width: auto;
         }
     }
