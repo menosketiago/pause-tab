@@ -10,6 +10,8 @@
     <body>
         <div id="message"></div>
 
+        <h1>Pause Tab</h1>
+
         <section>
             <h2>Untracked domains</h2>
 
@@ -17,27 +19,11 @@
                 <div class="empty-state">No domains blacklisted</div>
             </div>
 
-            <button class="pause-tab-btn destructive" id="btn-clear-all">
+            <button class="pause-tab-btn destructive hidden" id="btn-clear-all">
                 Remove all domains
             </button>
         </section>
 
-        <section>
-            <h2>Add untracked domain</h2>
-
-            <div class="add-domain">
-                <input
-                    type="text"
-                    id="input-add-domain"
-                    placeholder="example.com"
-                    autocomplete="off"
-                />
-                <button class="pause-tab-btn primary" id="btn-add-domain">
-                    Add
-                </button>
-            </div>
-        </section>
-
-        <script src="../scripts/popup.js"></script>
+<script src="../scripts/popup.js"></script>
     </body>
 </html>

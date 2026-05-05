@@ -59,19 +59,20 @@
     --color-overlay-bg: color-mix(in hsl, var(--color-bg) 60%, transparent);
 
     /* Buttons */
-    --btn-color-primary-bg: var(--color-accent);
-    --btn-color-primary-text: var(--color-black);
+    --btn-primary-bg: var(--color-accent);
+    --btn-primary-text: var(--color-black);
 
-    --btn-color-secondary-bg: color-mix(
+    --btn-secondary-bg: color-mix(
         in hsl,
-        var(--btn-color-primary-bg) 15%,
+        var(--btn-primary-bg) 15%,
         transparent
     );
-    --btn-color-secondary-text: var(--color-text);
+    --btn-secondary-text: var(--color-text);
 
-    --btn-color-destructive-bg: var(--color-baby-pink);
-    --btn-color-destructive-text: var(--color-black);
+    --btn-destructive-bg: var(--color-baby-pink);
+    --btn-destructive-text: var(--color-black);
 
+    --btn-padding: var(--space-medium) var(--space-large);
     --btn-radius: var(--radius-default);
 }
 
@@ -82,9 +83,9 @@
     justify-content: center !important;
     align-items: center !important;
     width: 100% !important;
-    padding: var(--space-medium) var(--space-large) !important;
-    background-color: var(--btn-color-secondary-bg) !important;
-    color: var(--btn-color-secondary-text) !important;
+    padding: var(--btn-padding) !important;
+    background-color: var(--btn-secondary-bg) !important;
+    color: var(--btn-secondary-text) !important;
     font-family: var(--font-family) !important;
     font-size: 1.1em !important;
     font-weight: var(--font-weight-bold) !important;
@@ -99,8 +100,13 @@
     }
 
     &:hover {
-        background-color: var(--color-text) !important;
-        color: var(--bg) !important;
+        &:hover {
+            background-color: color-mix(
+                in hsl,
+                var(--btn-secondary-bg) 84%,
+                var(--color-white)
+            ) !important;
+        }
     }
 
     &:active {
@@ -113,26 +119,26 @@
     }
 
     &.primary {
-        background-color: var(--btn-color-primary-bg) !important;
-        color: var(--btn-color-primary-text) !important;
+        background-color: var(--btn-primary-bg) !important;
+        color: var(--btn-primary-text) !important;
 
         &:hover {
             background-color: color-mix(
                 in hsl,
-                var(--btn-color-primary-bg) 84%,
+                var(--btn-primary-bg) 84%,
                 var(--color-bg)
             ) !important;
         }
     }
 
     &.destructive {
-        background-color: var(--btn-color-destructive-bg) !important;
-        color: var(--btn-color-destructive-text) !important;
+        background-color: var(--btn-destructive-bg) !important;
+        color: var(--btn-destructive-text) !important;
 
         &:hover {
             background-color: color-mix(
                 in hsl,
-                var(--btn-color-destructive-bg) 88%,
+                var(--btn-destructive-bg) 88%,
                 var(--color-bg)
             ) !important;
         }
@@ -142,6 +148,10 @@
         animation: holding-pulse var(--speed-pulse) infinite ease-in-out !important;
         transition: none !important;
     }
+}
+
+.hidden {
+    display: none !important;
 }
 
 /* OVERLAY STYLES */
@@ -314,6 +324,10 @@
     h3 {
         margin: 0;
         margin-bottom: var(--space-medium);
+    }
+
+    h1 {
+        margin-bottom: var(--space-extra);
     }
 
     section {
