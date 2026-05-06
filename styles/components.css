@@ -19,6 +19,7 @@
     transition: all var(--speed-default) ease;
 
     @supports (corner-shape: squircle) {
+        border-radius: var(--radius-large);
         corner-shape: squircle;
     }
 
@@ -50,6 +51,7 @@
     &.primary {
         background-color: var(--btn-primary-bg);
         color: var(--btn-primary-text);
+        border: var(--border-default);
 
         &:hover {
             background-color: color-mix(in hsl,

@@ -72,9 +72,10 @@
     --color-text-inverse: var(--color-black);
     --color-accent: var(--color-sky-blue);
 
-    --color-overlay-bg: color-mix(in hsl, var(--color-bg) 60%, transparent);
-
+    --border-default: 1px solid color-mix(in hsl, var(--color-text) 48%, transparent);
     --border-subtle: 1px solid color-mix(in hsl, var(--color-text) 12%, transparent);
+
+    --color-overlay-bg: color-mix(in hsl, var(--color-bg) 60%, transparent);
 
     /* Buttons */
     --btn-primary-bg: var(--color-accent);
