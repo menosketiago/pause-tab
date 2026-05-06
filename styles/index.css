@@ -339,8 +339,15 @@
             font-weight: var(--font-weight-extra);
             font-variant-numeric: tabular-nums slashed-zero;
             line-height: 100%;
+            text-box-trim: both;
+            text-box-edge: cap alphabetic;
             margin-bottom: var(--space-tiny);
             color: var(--color-text);
+
+            span {
+                display: inline-block;
+                animation: flip-number var(--speed-default) ease-out both;
+            }
         }
 
         p {
@@ -480,6 +487,18 @@
 }
 
 /* ANIMATIONS */
+
+@keyframes flip-number {
+    from {
+        transform: translateY(-0.75em);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
 
 @keyframes holding-pulse {
     0% {

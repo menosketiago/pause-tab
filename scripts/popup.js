@@ -17,6 +17,7 @@ const statsDomainEl = document.getElementById("stats-domain");
 const messageEl = document.getElementById("message");
 
 let currentDomain = null;
+let lastStatsValue = null;
 
 const loadStats = () => {
     if (!currentDomain) return;
@@ -25,18 +26,41 @@ const loadStats = () => {
         const seconds = (res[STORAGE_KEYS.TIME] || {})[`domain_${currentDomain}`] || 0;
         const totalMinutes = Math.floor(seconds / 60);
 
+        let displayValue, unitText;
+
         if (seconds < 60) {
-            statsMinutesEl.textContent = seconds;
-            statsUnitEl.textContent = seconds === 1 ? "second" : "seconds";
+            displayValue = seconds;
+            unitText = seconds === 1 ? "second" : "seconds";
         } else if (totalMinutes < 60) {
-            statsMinutesEl.textContent = totalMinutes;
-            statsUnitEl.textContent = totalMinutes === 1 ? "minute" : "minutes";
+            displayValue = totalMinutes;
+            unitText = totalMinutes === 1 ? "minute" : "minutes";
         } else {
+            displayValue = totalMinutes;
             const hours = Math.floor(totalMinutes / 60);
             const mins = totalMinutes % 60;
-            statsMinutesEl.textContent = totalMinutes;
-            statsUnitEl.textContent = `minutes (${hours}h ${mins}m)`;
+            unitText = `minutes (${hours}h ${mins}m)`;
         }
+
+        if (displayValue !== lastStatsValue) {
+            const prevStr = lastStatsValue !== null ? String(lastStatsValue) : "";
+            const newStr = String(displayValue);
+            const maxLen = Math.max(prevStr.length, newStr.length);
+            const paddedPrev = prevStr.padStart(maxLen, " ");
+
+            statsMinutesEl.innerHTML = newStr
+                .split("")
+                .map((char, i) => {
+                    const prevChar = paddedPrev[maxLen - newStr.length + i];
+                    return char !== prevChar
+                        ? `<span style="animation-delay:${i * 40}ms">${char}</span>`
+                        : char;
+                })
+                .join("");
+
+            lastStatsValue = displayValue;
+        }
+
+        statsUnitEl.textContent = unitText;
         statsDomainEl.textContent = currentDomain;
     });
 };
