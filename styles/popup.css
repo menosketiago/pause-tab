@@ -5,8 +5,6 @@
     overflow: hidden;
 
     body {
-        position: relative;
-        isolation: isolate;
         margin: 0;
         overflow: hidden;
         background-color: var(--color-bg);
@@ -15,23 +13,6 @@
         font-size: var(--font-size-base);
         font-optical-sizing: auto;
         font-weight: var(--font-weight-normal);
-
-        /* Space background */
-        &::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background-image: image-set(
-                url("../images/background.avif") type("image/avif"),
-                url("../images/background.webp") type("image/webp"),
-                url("../images/background.jpg") type("image/jpeg")
-            );
-            background-size: cover;
-            background-position: center;
-            opacity: .15;
-            pointer-events: none;
-            z-index: -1;
-        }
     }
 
     #pages-wrapper {

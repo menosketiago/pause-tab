@@ -58,7 +58,7 @@ const injectPauseModal = async (tab) => {
             overlay.setAttribute("aria-modal", "true");
             overlay.setAttribute("tabindex", "-1");
             overlay.innerHTML = `
-                <article>
+                <article class="bg-image">
                     <h1>Tab paused</h1>
                     <p>When you are ready, hold the button below for 5 seconds to resume.</p>
                     <footer>
