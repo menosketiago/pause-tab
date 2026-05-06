@@ -16,7 +16,10 @@
         <div id="page-main">
             <section class="stats">
                 <output id="stats-big-number">--</output>
+
                 <p><span id="stats-unit">minutes</span> spent on<br><strong id="stats-domain"></strong> today</p>
+
+                <div id="pill-tracking-disabled" class="pause-tab-pill is-hidden">Tracking disabled</div>
             </section>
 
             <section>
@@ -38,15 +41,16 @@
         <div id="page-manage-sites">
             <header>
                 <h1>Untracked sites</h1>
-                <button id="btn-back" class="pause-tab-btn secondary round btn-close-modal" aria-label="Back"></button>
+
+                <button id="btn-back" class="pause-tab-btn secondary close" aria-label="Back"></button>
             </header>
 
             <div class="blacklist-list" id="container-blacklist">
-                <div class="empty-state" id="blacklist-empty-state">No untracked sites</div>
+                <div class="empty-state" id="blacklist-empty-state">All sites are being tracked 🕵️‍♀️</div>
             </div>
 
             <button class="pause-tab-btn destructive is-hidden" id="btn-clear-all">
-                Clear list
+                Remove all
             </button>
 
             <div id="message"></div>

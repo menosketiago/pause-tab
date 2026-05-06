@@ -1,3 +1,5 @@
+/* Button */
+
 .pause-tab-btn {
     display: inline-flex !important;
     justify-content: center !important;
@@ -78,7 +80,7 @@
         }
     }
 
-    &.round {
+    &.close {
         width: var(--touch-target) !important;
         height: var(--touch-target) !important;
         padding: 0 !important;
@@ -89,6 +91,24 @@
         @supports (corner-shape: squircle) {
             corner-shape: initial;
         }
+
+        &::before,
+        &::after {
+            content: "";
+            position: absolute;
+            width: 40%;
+            height: 2px;
+            background-color: currentColor;
+            border-radius: 2px;
+        }
+
+        &::before {
+            transform: rotate(45deg);
+        }
+
+        &::after {
+            transform: rotate(-45deg);
+        }
     }
 
     &.is-holding {
@@ -97,25 +117,14 @@
     }
 }
 
-.btn-close-modal {
+/* Pill */
 
-    &::before,
-    &::after {
-        content: "";
-        position: absolute;
-        width: 40%;
-        height: 2px;
-        background-color: currentColor;
-        border-radius: 2px;
-    }
-
-    &::before {
-        transform: rotate(45deg);
-    }
-
-    &::after {
-        transform: rotate(-45deg);
-    }
+.pause-tab-pill {
+    background-color: var(--color-pill-bg) !important;
+    color: var(--color-text-inverse) !important;
+    font-size: var(--font-size-small) !important;
+    padding: var(--space-small) var(--space-medium) !important;
+    border-radius: var(--radius-round) ;
 }
 
 /* Class to hide elements */

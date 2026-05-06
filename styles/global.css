@@ -41,8 +41,10 @@
 
     /* Typography */
     --font-family: "Inter", sans-serif;
-    --font-size-base: 16px;
+    --font-size-base: 14px;
+    --font-size-small: 0.875em;
     --font-size-large: 1.25em;
+    --font-size-extra: 1.5625em;
     --font-weight-normal: 500;
     --font-weight-bold: 600;
     --font-weight-extra: 800;
@@ -80,6 +82,9 @@
 
     --btn-padding: var(--space-medium) var(--space-large);
     --btn-radius: var(--radius-default);
+
+    /* Pill */
+    --color-pill-bg: var(--color-baby-pink);
 }
 
 /* RESET */

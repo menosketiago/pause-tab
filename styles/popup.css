@@ -92,13 +92,18 @@
             }
 
             p {
-                line-height: 1.5;
-                text-wrap: pretty;
                 margin: 0;
+                font-size: var(--font-size-large);
+                line-height: 140%;
+                text-wrap: pretty;
 
                 strong {
                     color: var(--color-text);
                 }
+            }
+
+            .pause-tab-pill {
+                margin-top: var(--space-large);
             }
         }
     }
@@ -112,7 +117,7 @@
 
             h1 {
                 margin-bottom: 0;
-                font-size: var(--font-size-large);
+                font-size: var(--font-size-extra);
             }
         }
 
@@ -143,17 +148,15 @@
 
         .message {
             padding: var(--space-large);
-            margin-top: var(--space-large);
-            background-color: color-mix(in hsl, var(--color-text) 12%, transparent);
-            text-wrap: pretty;
+            margin-top: var(--space-extra);
+            background-color: var(--btn-secondary-bg);
+            color: var(--color-text);
+            font-size: var(--font-size-small);
+            text-wrap: balanced;
             border-radius: var(--space-small);
 
             @supports (corner-shape: squircle) {
                 corner-shape: squircle;
-            }
-
-            &.success {
-                background-color: color-mix(in hsl, var(--color-mint) 24%, transparent);
             }
 
             &.error {
