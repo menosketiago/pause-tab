@@ -7,7 +7,7 @@
     body {
         margin: 0;
         overflow: hidden;
-        background: var(--color-bg) linear-gradient(to right,
+        background: var(--color-bg) linear-gradient(to bottom,
                 hsl(from var(--color-bg) h s 20),
                 var(--color-bg));
         color: var(--color-text-subtle);
@@ -34,6 +34,7 @@
         flex: 0 0 var(--popup-width);
         padding: var(--space-extra);
         box-sizing: border-box;
+        max-width: var(--popup-width);
 
         h1,
         h2,
@@ -76,12 +77,10 @@
             text-align: center;
 
             output {
-                font-size: 6em;
+                font-size: 8em;
                 font-weight: var(--font-weight-extra);
                 font-variant-numeric: tabular-nums slashed-zero;
                 line-height: 100%;
-                text-box-trim: both;
-                text-box-edge: cap alphabetic;
                 margin-bottom: var(--space-tiny);
                 color: var(--color-text);
 
@@ -113,7 +112,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: var(--space-extra);
+            margin-bottom: var(--space-large);
 
             h1 {
                 margin-bottom: 0;
@@ -129,20 +128,45 @@
         }
 
         .blacklist-item {
+            position: relative;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: var(--space-medium);
+            gap: var(--space-large);
 
             span {
+                max-width: calc(100% * 2 / 3);
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
+
+                &[data-tooltip]::after {
+                    content: attr(data-tooltip);
+                    position: absolute;
+                    top: calc(100% + var(--space-tiny));
+                    left: 0;
+                    right: 0;
+                    z-index: 10;
+                    padding: var(--space-small);
+                    background-color: var(--color-text);
+                    color: var(--color-bg);
+                    font-size: var(--font-size-small);
+                    border-radius: var(--radius-default);
+                    word-break: break-all;
+                    white-space: normal;
+                    opacity: 0;
+                    pointer-events: none;
+                    transition: opacity 0s;
+                }
+
+                &[data-tooltip]:hover::after {
+                    opacity: 1;
+                }
             }
 
             .item-remove {
                 width: auto !important;
-                flex-shrink: 0;
+                font-size: var(--font-size-small) !important;
             }
         }
 

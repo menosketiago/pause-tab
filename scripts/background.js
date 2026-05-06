@@ -359,7 +359,26 @@ chrome.runtime.onInstalled.addListener(async () => {
         [STORAGE_KEYS.TIME]: {},
         [STORAGE_KEYS.DATE]: getLocalDate(),
         [STORAGE_KEYS.PAUSED]: {},
-        [STORAGE_KEYS.BLACKLIST]: {},
+        [STORAGE_KEYS.BLACKLIST]: {
+            "domain_x.com": true,
+            "domain_youtube.com": true,
+            "domain_twitter.com": true,
+            "domain_reddit.com": true,
+            "domain_news.ycombinator.com": true,
+            "domain_thisisaverylongdomainnamethatmightbreakthelayout.co.uk": true,
+            "domain_fb.com": true,
+            "domain_instagram.com": true,
+            "domain_tiktok.com": true,
+            "domain_linkedin.com": true,
+            "domain_twitch.tv": true,
+            "domain_mail.google.com": true,
+            "domain_open.spotify.com": true,
+            "domain_app.slack.com": true,
+            "domain_stackoverflow.com": true,
+            "domain_en.wikipedia.org": true,
+            "domain_anotherextremelylongdomainthatdefinitelywontfitandwilltruncate.international": true,
+            "domain_sub.another.deep.nested.domain.example.com": true,
+        },
     });
 
     updateActiveTab();

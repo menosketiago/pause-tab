@@ -130,14 +130,26 @@ const loadBlacklist = () => {
 
         domains.forEach((domain) => {
             const item = document.createElement("div");
-
             item.className = "blacklist-item";
-            item.innerHTML = `
-                <span>${domain}</span>
-                <button class="item-remove pause-tab-btn secondary" data-domain="${domain}">Remove</button>
-            `;
+            
+            // 1. Create the span explicitly so we can measure it
+            const span = document.createElement("span");
+            span.textContent = domain;
+            
+            const button = document.createElement("button");
+            button.className = "pause-tab-btn secondary item-remove";
+            button.dataset.domain = domain;
+            button.textContent = "Remove";
 
+            item.appendChild(span);
+            item.appendChild(button);
             blacklistContainer.appendChild(item);
+
+            // 2. Logic: Only add the title attribute if the text is truncated
+            // Note: This must happen AFTER item is appended to the container
+            if (span.scrollWidth > span.clientWidth) {
+                span.setAttribute("data-tooltip", domain);
+            }
         });
 
         document.querySelectorAll(".item-remove").forEach((btn) => {
