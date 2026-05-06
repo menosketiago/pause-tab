@@ -1,65 +1,65 @@
 /* TIME TRACKING TOAST */
 
 #pause-tab-toast-container {
-    position: fixed !important;
-    top: var(--space-extra) !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    z-index: 2147483647 !important;
-    pointer-events: none !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    animation: show-toast var(--speed-slow) ease-out forwards !important;
+    position: fixed;
+    top: var(--space-extra);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2147483647;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: show-toast var(--speed-slow) ease-out forwards;
 
     /* Creates a new stacking context so ::before stays behind the content */
-    isolation: isolate !important;
+    isolation: isolate;
 
     &::before {
-        content: "" !important;
-        position: absolute !important;
-        inset: -4px !important;
-        border-radius: calc(var(--radius-extra) - var(--space-large)) !important;
+        content: "";
+        position: absolute;
+        inset: -4px;
+        border-radius: calc(var(--radius-extra) - var(--space-large));
         background: linear-gradient(to right,
                 var(--color-thistle),
                 var(--color-pastel-petal),
                 var(--color-baby-pink),
                 var(--color-icy-blue),
-                var(--color-sky-blue)) !important;
-        filter: blur(var(--blur-radius)) !important;
-        z-index: -1 !important;
+                var(--color-sky-blue));
+        filter: blur(var(--blur-radius));
+        z-index: -1;
     }
 }
 
 #pause-tab-toast {
-    position: relative !important;
-    display: flex !important;
-    align-items: center !important;
-    padding: var(--space-large) !important;
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: var(--space-large);
     background: var(--color-bg) linear-gradient(to right,
             hsl(from var(--color-bg) h s 20),
-            var(--color-bg)) !important;
-    color: var(--color-text) !important;
-    border: var(--border-subtle) !important;
-    border-radius: var(--radius-extra) !important;
-    font-family: var(--font-family) !important;
-    font-size: var(--font-size-base) !important;
-    font-optical-sizing: auto !important;
-    font-weight: var(--font-weight-bold) !important;
-    white-space: nowrap !important;
-    pointer-events: all !important;
-    cursor: pointer !important;
-    z-index: 1 !important;
+            var(--color-bg));
+    color: var(--color-text);
+    border: var(--border-subtle);
+    border-radius: var(--radius-extra);
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    font-optical-sizing: auto;
+    font-weight: var(--font-weight-bold);
+    white-space: nowrap;
+    pointer-events: all;
+    cursor: pointer;
+    z-index: 1;
 
     @supports (corner-shape: squircle) {
         corner-shape: squircle;
     }
 
     img {
-        width: var(--space-large) !important;
-        height: var(--space-large) !important;
-        margin-right: var(--space-medium) !important;
-        border-radius: calc(var(--radius-extra) - var(--space-large)) !important;
+        width: var(--space-large);
+        height: var(--space-large);
+        margin-right: var(--space-medium);
+        border-radius: calc(var(--radius-extra) - var(--space-large));
 
         @supports (corner-shape: squircle) {
             corner-shape: squircle;

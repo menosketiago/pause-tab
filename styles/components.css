@@ -1,91 +1,91 @@
 /* Button */
 
 .pause-tab-btn {
-    display: inline-flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    width: 100% !important;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
     min-height: var(--touch-target);
-    padding: var(--btn-padding) !important;
+    padding: var(--btn-padding);
     background-color: transparent;
-    color: var(--color-text-subtle) !important;
-    font-family: var(--font-family) !important;
-    font-size: 0.9em !important;
-    font-weight: var(--font-weight-normal) !important;
-    line-height: 100% !important;
-    border: none !important;
-    border-radius: var(--btn-radius) !important;
-    cursor: pointer !important;
-    transition: all var(--speed-default) ease !important;
+    color: var(--color-text-subtle);
+    font-family: var(--font-family);
+    font-size: 0.9em;
+    font-weight: var(--font-weight-normal);
+    line-height: 100%;
+    border: none;
+    border-radius: var(--btn-radius);
+    cursor: pointer;
+    transition: all var(--speed-default) ease;
 
     @supports (corner-shape: squircle) {
         corner-shape: squircle;
     }
 
     &:hover {
-        color: var(--color-text) !important;
+        color: var(--color-text);
         text-decoration: underline dotted;
         text-underline-offset: var(--space-tiny);
         text-decoration-skip-ink: auto;
     }
 
     &:focus-visible {
-        outline: 2px solid var(--color-text) !important;
-        outline-offset: 2px !important;
+        outline: 2px solid var(--color-text);
+        outline-offset: 2px;
     }
 
     &.primary,
     &.secondary,
     &.destructive {
-        font-size: 1em !important;
-        font-weight: var(--font-weight-bold) !important;
+        font-size: 1em;
+        font-weight: var(--font-weight-bold);
         text-decoration: none;
-        border: var(--border-subtle) !important;
+        border: var(--border-subtle);
 
         &:active {
-            transform: scale(0.96) !important;
+            transform: scale(0.96);
         }
     }
 
     &.primary {
-        background-color: var(--btn-primary-bg) !important;
-        color: var(--btn-primary-text) !important;
+        background-color: var(--btn-primary-bg);
+        color: var(--btn-primary-text);
 
         &:hover {
             background-color: color-mix(in hsl,
                     var(--btn-primary-bg) 84%,
-                    var(--color-bg)) !important;
+                    var(--color-bg));
         }
     }
 
     &.secondary {
-        background-color: var(--btn-secondary-bg) !important;
-        color: var(--btn-secondary-text) !important;
+        background-color: var(--btn-secondary-bg);
+        color: var(--btn-secondary-text);
 
         &:hover {
             background-color: color-mix(in hsl,
                     var(--btn-secondary-bg) 78%,
-                    var(--color-accent)) !important;
+                    var(--color-accent));
         }
     }
 
     &.destructive {
-        background-color: var(--btn-destructive-bg) !important;
-        color: var(--btn-destructive-text) !important;
+        background-color: var(--btn-destructive-bg);
+        color: var(--btn-destructive-text);
 
         &:hover {
             background-color: color-mix(in hsl,
                     var(--btn-destructive-bg) 88%,
-                    var(--color-bg)) !important;
+                    var(--color-bg));
         }
     }
 
     &.close {
-        width: var(--touch-target) !important;
-        height: var(--touch-target) !important;
-        padding: 0 !important;
-        border-radius: var(--radius-round) !important;
-        flex-shrink: 0 !important;
+        width: var(--touch-target);
+        height: var(--touch-target);
+        padding: 0;
+        border-radius: var(--radius-round);
+        flex-shrink: 0;
         position: relative;
 
         @supports (corner-shape: squircle) {
@@ -112,19 +112,19 @@
     }
 
     &.is-holding {
-        animation: holding-pulse var(--speed-pulse) infinite ease-in-out !important;
-        transition: none !important;
+        animation: holding-pulse var(--speed-pulse) infinite ease-in-out;
+        transition: none;
     }
 }
 
 /* Pill */
 
 .pause-tab-pill {
-    background-color: var(--color-pill-bg) !important;
-    color: var(--color-text-inverse) !important;
-    font-size: var(--font-size-small) !important;
-    padding: var(--space-small) var(--space-medium) !important;
-    border-radius: var(--radius-round) ;
+    background-color: var(--color-pill-bg);
+    color: var(--color-text-inverse);
+    font-size: var(--font-size-small);
+    padding: var(--space-small) var(--space-medium);
+    border-radius: var(--radius-round);
 }
 
 /* Class to hide elements */

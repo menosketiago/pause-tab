@@ -6,6 +6,7 @@
 
     body {
         position: relative;
+        isolation: isolate;
         margin: 0;
         overflow: hidden;
         background-color: var(--color-bg);
@@ -15,6 +16,7 @@
         font-optical-sizing: auto;
         font-weight: var(--font-weight-normal);
 
+        /* Space background */
         &::before {
             content: "";
             position: absolute;
@@ -27,6 +29,7 @@
             background-size: cover;
             background-position: center;
             opacity: .15;
+            pointer-events: none;
             z-index: -1;
         }
     }
