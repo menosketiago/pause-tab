@@ -339,7 +339,7 @@ chrome.runtime.onInstalled.addListener(async () => {
 
     chrome.contextMenus.create({
         id: "track-domain",
-        title: "Track time on this site",
+        title: "Resume tracking this site",
         contexts: ["page"],
     });
 
@@ -351,7 +351,7 @@ chrome.runtime.onInstalled.addListener(async () => {
 
     chrome.contextMenus.create({
         id: "track-domain-action",
-        title: "Track time on this site",
+        title: "Resume tracking this site",
         contexts: ["action"],
     });
 
