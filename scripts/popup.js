@@ -3,7 +3,24 @@ const STORAGE_KEYS = {
     TIME: "timeTracking",
 };
 
-const blacklistModal = document.getElementById("modal-blacklist");
+const pagesWrapper = document.getElementById("pages-wrapper");
+const pageMain = document.getElementById("page-main");
+const pageManageSites = document.getElementById("page-manage-sites");
+
+const updateHeight = () => {
+    const activePage = pagesWrapper.classList.contains("show-manage-sites")
+        ? pageManageSites
+        : pageMain;
+    pagesWrapper.style.height = `${activePage.scrollHeight}px`;
+};
+
+const navigateTo = (showManage) => {
+    pagesWrapper.style.height = `${pagesWrapper.offsetHeight}px`;
+    pagesWrapper.offsetHeight; // force layout so transition has a from-value
+    pagesWrapper.classList.toggle("show-manage-sites", showManage);
+    const target = showManage ? pageManageSites : pageMain;
+    pagesWrapper.style.height = `${target.scrollHeight}px`;
+};
 const blacklistContainer = document.getElementById("container-blacklist");
 const blacklistEmptyState = document.getElementById("blacklist-empty-state");
 const clearAllBtn = document.getElementById("btn-clear-all");
@@ -106,7 +123,7 @@ const loadBlacklist = () => {
             item.className = "blacklist-item";
             item.innerHTML = `
                 <span>${domain}</span>
-                <button class="item-remove pause-tab-btn destructive" data-domain="${domain}">Remove</button>
+                <button class="item-remove pause-tab-btn secondary" data-domain="${domain}">Remove</button>
             `;
 
             blacklistContainer.appendChild(item);
@@ -117,6 +134,8 @@ const loadBlacklist = () => {
                 removeFromBlacklist(e.target.dataset.domain);
             });
         });
+
+        updateHeight();
     });
 };
 
@@ -164,17 +183,9 @@ trackTabBtn.addEventListener("click", () => {
     }
 });
 
-manageSitesBtn.addEventListener("click", () => {
-    blacklistModal.showModal();
-});
+manageSitesBtn.addEventListener("click", () => navigateTo(true));
 
-document.getElementById("btn-close-modal").addEventListener("click", () => {
-    blacklistModal.close();
-});
-
-blacklistModal.addEventListener("click", (e) => {
-    if (e.target === blacklistModal) blacklistModal.close();
-});
+document.getElementById("btn-back").addEventListener("click", () => navigateTo(false));
 
 clearAllBtn.addEventListener("click", clearAll);
 

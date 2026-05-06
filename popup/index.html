@@ -6,46 +6,52 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pause Tab Settings</title>
 
-    <link rel="stylesheet" href="../styles/index.css" />
+    <link rel="stylesheet" href="../styles/global.css" />
+    <link rel="stylesheet" href="../styles/components.css" />
+    <link rel="stylesheet" href="../styles/popup.css" />
 </head>
 
 <body>
-    <section class="stats">
-        <output id="stats-big-number">--</output>
-        <p><span id="stats-unit">minutes</span> spent on<br><strong id="stats-domain"></strong> today</p>
-    </section>
+    <div id="pages-wrapper">
+        <div id="page-main">
+            <section class="stats">
+                <output id="stats-big-number">--</output>
+                <p><span id="stats-unit">minutes</span> spent on<br><strong id="stats-domain"></strong> today</p>
+            </section>
 
-    <section>
-        <button class="pause-tab-btn primary" id="btn-pause-tab">
-            Pause tab
-        </button>
+            <section>
+                <button class="pause-tab-btn primary" id="btn-pause-tab">
+                    Pause tab
+                </button>
 
-        <button class="pause-tab-btn secondary" id="btn-blacklist-tab">
-            Don't track this site
-        </button>
-        <button class="pause-tab-btn secondary is-hidden" id="btn-track-tab">
-            Resume tracking this site
-        </button>   
-    </section>
+                <button class="pause-tab-btn secondary" id="btn-blacklist-tab">
+                    Don't track this site
+                </button>
+                <button class="pause-tab-btn secondary is-hidden" id="btn-track-tab">
+                    Resume tracking this site
+                </button>
+            </section>
 
-    <button id="btn-manage-sites" class="pause-tab-btn is-hidden">Manage untracked sites →</button>
-    
-    <dialog id="modal-blacklist" class="modal-blacklist">
-        <header>
-            <h2>Untracked sites</h2>
-            <button id="btn-close-modal" class="btn-close-modal" aria-label="Close"></button>
-        </header>
-
-        <div class="blacklist-list" id="container-blacklist">
-            <div class="empty-state" id="blacklist-empty-state">No untracked sites</div>
+            <button id="btn-manage-sites" class="pause-tab-btn is-hidden">Manage untracked sites →</button>
         </div>
 
-        <button class="pause-tab-btn destructive is-hidden" id="btn-clear-all">
-            Remove all sites
-        </button>
+        <div id="page-manage-sites">
+            <header>
+                <h1>Untracked sites</h1>
+                <button id="btn-back" class="pause-tab-btn secondary round btn-close-modal" aria-label="Back"></button>
+            </header>
 
-        <div id="message"></div>
-    </dialog>
+            <div class="blacklist-list" id="container-blacklist">
+                <div class="empty-state" id="blacklist-empty-state">No untracked sites</div>
+            </div>
+
+            <button class="pause-tab-btn destructive is-hidden" id="btn-clear-all">
+                Clear list
+            </button>
+
+            <div id="message"></div>
+        </div>
+    </div>
 
     <script src="../scripts/popup.js"></script>
 </body>

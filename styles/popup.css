@@ -1,0 +1,178 @@
+/* EXTENSION POPUP */
+
+#pause-tab-popup {
+    width: var(--popup-width);
+    overflow: hidden;
+
+    body {
+        margin: 0;
+        overflow: hidden;
+        background: var(--color-bg) linear-gradient(to right,
+                hsl(from var(--color-bg) h s 20),
+                var(--color-bg));
+        color: var(--color-text-subtle);
+        font-family: var(--font-family);
+        font-size: var(--font-size-base);
+        font-optical-sizing: auto;
+        font-weight: var(--font-weight-normal);
+    }
+
+    #pages-wrapper {
+        display: flex;
+        align-items: flex-start;
+        width: calc(var(--popup-width) * 2);
+        transition: transform var(--speed-slow) cubic-bezier(0.25, 1, 0.5, 1),
+            height var(--speed-slow) cubic-bezier(0.25, 1, 0.5, 1);
+
+        &.show-manage-sites {
+            transform: translateX(-50%);
+        }
+    }
+
+    #page-main,
+    #page-manage-sites {
+        flex: 0 0 var(--popup-width);
+        padding: var(--space-extra);
+        box-sizing: border-box;
+
+        h1,
+        h2,
+        h3 {
+            margin: 0;
+            margin-bottom: var(--space-extra);
+            color: var(--color-text);
+        }
+
+        section {
+            margin-bottom: var(--space-extra);
+
+            &:last-of-type,
+            &:last-child,
+            &:has(+ section.is-hidden) {
+                margin-bottom: 0;
+            }
+
+            &:has(+ #btn-manage-sites:not(.is-hidden)) {
+                margin-bottom: var(--space-medium);
+            }
+
+            .pause-tab-btn {
+                margin-bottom: var(--space-medium);
+
+                &:last-of-type,
+                &:last-child,
+                &:has(+ .pause-tab-btn.is-hidden):not(:has(~ .pause-tab-btn:not(.is-hidden))) {
+                    margin-bottom: 0;
+                }
+            }
+        }
+    }
+
+    #page-main {
+        .stats {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+
+            output {
+                font-size: 6em;
+                font-weight: var(--font-weight-extra);
+                font-variant-numeric: tabular-nums slashed-zero;
+                line-height: 100%;
+                text-box-trim: both;
+                text-box-edge: cap alphabetic;
+                margin-bottom: var(--space-tiny);
+                color: var(--color-text);
+
+                span {
+                    display: inline-block;
+                    animation: flip-number var(--speed-default) ease-out both;
+                }
+            }
+
+            p {
+                line-height: 1.5;
+                text-wrap: pretty;
+                margin: 0;
+
+                strong {
+                    color: var(--color-text);
+                }
+            }
+        }
+    }
+
+    #page-manage-sites {
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-extra);
+
+            h1 {
+                margin-bottom: 0;
+                font-size: var(--font-size-large);
+            }
+        }
+
+        .blacklist-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-small);
+            margin-bottom: var(--space-large);
+        }
+
+        .blacklist-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--space-medium);
+
+            span {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .item-remove {
+                width: auto !important;
+                flex-shrink: 0;
+            }
+        }
+
+        .message {
+            padding: var(--space-large);
+            margin-top: var(--space-large);
+            background-color: color-mix(in hsl, var(--color-text) 12%, transparent);
+            text-wrap: pretty;
+            border-radius: var(--space-small);
+
+            @supports (corner-shape: squircle) {
+                corner-shape: squircle;
+            }
+
+            &.success {
+                background-color: color-mix(in hsl, var(--color-mint) 24%, transparent);
+            }
+
+            &.error {
+                background-color: color-mix(in hsl, var(--color-baby-pink) 24%, transparent);
+            }
+        }
+    }
+}
+
+/* ANIMATIONS */
+
+@keyframes flip-number {
+    from {
+        transform: translateY(-0.75em);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}

@@ -17,7 +17,7 @@ const injectPauseModal = (tab) => {
     chrome.scripting
         .insertCSS({
             target: { tabId: tab.id },
-            files: ["styles/index.css"],
+            files: ["styles/global.css", "styles/components.css", "styles/overlay.css"],
         })
         .catch((err) => console.error("CSS Injection failed:", err));
 
@@ -156,7 +156,7 @@ const injectTimeTracking = (tab) => {
     chrome.scripting
         .insertCSS({
             target: { tabId: tab.id },
-            files: ["styles/index.css"],
+            files: ["styles/global.css", "styles/components.css", "styles/toast.css"],
         })
         .catch(() => { });
 

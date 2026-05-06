@@ -1,0 +1,147 @@
+.pause-tab-btn {
+    display: inline-flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100% !important;
+    min-height: var(--touch-target);
+    padding: var(--btn-padding) !important;
+    background-color: transparent;
+    color: var(--color-text-subtle) !important;
+    font-family: var(--font-family) !important;
+    font-size: 0.9em !important;
+    font-weight: var(--font-weight-normal) !important;
+    line-height: 100% !important;
+    border: none !important;
+    border-radius: var(--btn-radius) !important;
+    cursor: pointer !important;
+    transition: all var(--speed-default) ease !important;
+
+    @supports (corner-shape: squircle) {
+        corner-shape: squircle;
+    }
+
+    &:hover {
+        color: var(--color-text) !important;
+        text-decoration: underline dotted;
+        text-underline-offset: var(--space-tiny);
+        text-decoration-skip-ink: auto;
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--color-text) !important;
+        outline-offset: 2px !important;
+    }
+
+    &.primary,
+    &.secondary,
+    &.destructive {
+        font-size: 1em !important;
+        font-weight: var(--font-weight-bold) !important;
+        text-decoration: none;
+        border: var(--border-subtle) !important;
+
+        &:active {
+            transform: scale(0.96) !important;
+        }
+    }
+
+    &.primary {
+        background-color: var(--btn-primary-bg) !important;
+        color: var(--btn-primary-text) !important;
+
+        &:hover {
+            background-color: color-mix(in hsl,
+                    var(--btn-primary-bg) 84%,
+                    var(--color-bg)) !important;
+        }
+    }
+
+    &.secondary {
+        background-color: var(--btn-secondary-bg) !important;
+        color: var(--btn-secondary-text) !important;
+
+        &:hover {
+            background-color: color-mix(in hsl,
+                    var(--btn-secondary-bg) 78%,
+                    var(--color-accent)) !important;
+        }
+    }
+
+    &.destructive {
+        background-color: var(--btn-destructive-bg) !important;
+        color: var(--btn-destructive-text) !important;
+
+        &:hover {
+            background-color: color-mix(in hsl,
+                    var(--btn-destructive-bg) 88%,
+                    var(--color-bg)) !important;
+        }
+    }
+
+    &.round {
+        width: var(--touch-target) !important;
+        height: var(--touch-target) !important;
+        padding: 0 !important;
+        border-radius: var(--radius-round) !important;
+        flex-shrink: 0 !important;
+        position: relative;
+
+        @supports (corner-shape: squircle) {
+            corner-shape: initial;
+        }
+    }
+
+    &.is-holding {
+        animation: holding-pulse var(--speed-pulse) infinite ease-in-out !important;
+        transition: none !important;
+    }
+}
+
+.btn-close-modal {
+
+    &::before,
+    &::after {
+        content: "";
+        position: absolute;
+        width: 40%;
+        height: 2px;
+        background-color: currentColor;
+        border-radius: 2px;
+    }
+
+    &::before {
+        transform: rotate(45deg);
+    }
+
+    &::after {
+        transform: rotate(-45deg);
+    }
+}
+
+/* Class to hide elements */
+
+.is-hidden {
+    display: none !important;
+}
+
+@keyframes holding-pulse {
+    0% {
+        background-color: var(--color-thistle);
+    }
+
+    25% {
+        background-color: var(--color-pastel-petal);
+    }
+
+    50% {
+        background-color: var(--color-baby-pink);
+    }
+
+    75% {
+        background-color: var(--color-icy-blue);
+    }
+
+    100% {
+        background-color: var(--color-sky-blue);
+    }
+}
