@@ -23,10 +23,20 @@ const loadStats = () => {
 
     chrome.storage.local.get([STORAGE_KEYS.TIME], (res) => {
         const seconds = (res[STORAGE_KEYS.TIME] || {})[`domain_${currentDomain}`] || 0;
-        const minutes = Math.floor(seconds / 60);
+        const totalMinutes = Math.floor(seconds / 60);
 
-        statsMinutesEl.textContent = minutes;
-        statsUnitEl.textContent = minutes === 1 ? "minute" : "minutes";
+        if (seconds < 60) {
+            statsMinutesEl.textContent = seconds;
+            statsUnitEl.textContent = seconds === 1 ? "second" : "seconds";
+        } else if (totalMinutes < 60) {
+            statsMinutesEl.textContent = totalMinutes;
+            statsUnitEl.textContent = totalMinutes === 1 ? "minute" : "minutes";
+        } else {
+            const hours = Math.floor(totalMinutes / 60);
+            const mins = totalMinutes % 60;
+            statsMinutesEl.textContent = totalMinutes;
+            statsUnitEl.textContent = `minutes (${hours}h ${mins}m)`;
+        }
         statsDomainEl.textContent = currentDomain;
     });
 };
@@ -163,3 +173,5 @@ chrome.runtime.onMessage.addListener((msg) => {
         updateTrackingBtn();
     }
 });
+
+setInterval(loadStats, 1000);

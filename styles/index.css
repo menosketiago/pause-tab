@@ -63,6 +63,8 @@
 
     --color-overlay-bg: color-mix(in hsl, var(--color-bg) 60%, transparent);
 
+    --border-subtle: 1px solid color-mix(in hsl, var(--color-text) 12%, transparent);
+
     /* Buttons */
     --btn-primary-bg: var(--color-accent);
     --btn-primary-text: var(--color-black);
@@ -94,9 +96,6 @@
     font-size: 0.9em !important;
     font-weight: var(--font-weight-normal) !important;
     line-height: 100% !important;
-    text-decoration: underline dotted;
-    text-underline-offset: var(--space-tiny);
-    text-decoration-skip-ink: auto;
     border: none !important;
     border-radius: var(--btn-radius) !important;
     cursor: pointer !important;
@@ -108,6 +107,9 @@
 
     &:hover {
         color: var(--color-text) !important;
+        text-decoration: underline dotted;
+        text-underline-offset: var(--space-tiny);
+        text-decoration-skip-ink: auto;
     }
 
     &:focus-visible {
@@ -121,6 +123,7 @@
         font-size: 1em !important;
         font-weight: var(--font-weight-bold) !important;
         text-decoration: none;
+        border: var(--border-subtle) !important;
 
         &:active {
             transform: scale(0.96) !important;
@@ -201,7 +204,7 @@
         background: var(--color-bg) linear-gradient(340deg,
                 hsl(from var(--color-bg) h s 0.12) -120%,
                 var(--color-bg)) !important;
-        border: 1px solid hsl(from var(--color-bg) h s 20 / 0.8) !important;
+        border: var(--border-subtle) !important;
         border-radius: var(--radius-large) !important;
         text-align: center !important;
 
@@ -257,15 +260,15 @@
         content: "" !important;
         position: absolute !important;
         inset: -4px !important;
-        z-index: -1 !important;
         border-radius: calc(var(--radius-extra) - var(--space-large)) !important;
         background: linear-gradient(to right,
-                var(--color-thistle),
-                var(--color-pastel-petal),
-                var(--color-baby-pink),
-                var(--color-icy-blue),
-                var(--color-sky-blue)) !important;
+        var(--color-thistle),
+        var(--color-pastel-petal),
+        var(--color-baby-pink),
+        var(--color-icy-blue),
+        var(--color-sky-blue)) !important;
         filter: blur(var(--blur-radius)) !important;
+        z-index: -1 !important;
     }
 }
 
@@ -278,6 +281,7 @@
             hsl(from var(--color-bg) h s 20),
             var(--color-bg)) !important;
     color: var(--color-text) !important;
+    border: var(--border-subtle) !important;
     border-radius: var(--radius-extra) !important;
     font-family: var(--font-family) !important;
     font-size: var(--font-size-base) !important;
@@ -331,10 +335,12 @@
         text-align: center;
 
         output {
-            font-size: 4em;
+            font-size: 6em;
             font-weight: var(--font-weight-extra);
+            font-variant-numeric: tabular-nums slashed-zero;
             line-height: 100%;
-            margin-bottom: var(--space-small);
+            margin-bottom: var(--space-tiny);
+            color: var(--color-text);
         }
 
         p {
@@ -402,7 +408,7 @@
         }
     }
 
-    dialog {
+    .modal-blacklist {
         position: fixed;
         inset: 0;
         width: var(--popup-width);
