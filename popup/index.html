@@ -10,30 +10,42 @@
 </head>
 
 <body>
+    <section class="stats">
+        <output id="stats-big-number">--</output>
+        <p><span id="stats-unit">minutes</span> spent on<br><strong id="stats-domain"></strong> today</p>
+    </section>
+
     <section>
         <button class="pause-tab-btn primary" id="btn-pause-tab">
-            Pause this tab
+            Pause tab
         </button>
 
-        <button class="pause-tab-btn" id="btn-blacklist-tab">
-            Don't time track this site
+        <button class="pause-tab-btn secondary" id="btn-blacklist-tab">
+            Don't track this site
         </button>
-        <button class="pause-tab-btn hidden" id="btn-track-tab">
-            Track this site again
-        </button>
+        <button class="pause-tab-btn secondary is-hidden" id="btn-track-tab">
+            Resume tracking this site
+        </button>   
     </section>
 
-    <section class="hidden" id="section-blacklist">
-        <h2>Sites not being tracked</h2>
+    <button id="btn-manage-sites" class="pause-tab-btn is-hidden">Manage untracked sites</button>
+    
+    <dialog id="modal-blacklist" >
+        <header>
+            <h2>Sites not being tracked</h2>
+            <button id="btn-close-modal" class="btn-close-modal" aria-label="Close"></button>
+        </header>
 
-        <div class="blacklist-list" id="container-blacklist"></div>
+        <div class="blacklist-list" id="container-blacklist">
+            <div class="empty-state" id="blacklist-empty-state">No untracked sites</div>
+        </div>
 
-        <button class="pause-tab-btn destructive hidden" id="btn-clear-all">
+        <button class="pause-tab-btn destructive is-hidden" id="btn-clear-all">
             Remove all sites
         </button>
-    </section>
 
-    <div id="message"></div>
+        <div id="message"></div>
+    </dialog>
 
     <script src="../scripts/popup.js"></script>
 </body>

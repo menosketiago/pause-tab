@@ -1,16 +1,35 @@
 const STORAGE_KEYS = {
     BLACKLIST: "blacklistedDomains",
+    TIME: "timeTracking",
 };
 
-const blacklistSection = document.getElementById("section-blacklist");
+const blacklistModal = document.getElementById("modal-blacklist");
 const blacklistContainer = document.getElementById("container-blacklist");
+const blacklistEmptyState = document.getElementById("blacklist-empty-state");
 const clearAllBtn = document.getElementById("btn-clear-all");
 const pauseTabBtn = document.getElementById("btn-pause-tab");
 const blacklistTabBtn = document.getElementById("btn-blacklist-tab");
 const trackTabBtn = document.getElementById("btn-track-tab");
+const manageSitesBtn = document.getElementById("btn-manage-sites");
+const statsMinutesEl = document.getElementById("stats-big-number");
+const statsUnitEl = document.getElementById("stats-unit");
+const statsDomainEl = document.getElementById("stats-domain");
 const messageEl = document.getElementById("message");
 
 let currentDomain = null;
+
+const loadStats = () => {
+    if (!currentDomain) return;
+
+    chrome.storage.local.get([STORAGE_KEYS.TIME], (res) => {
+        const seconds = (res[STORAGE_KEYS.TIME] || {})[`domain_${currentDomain}`] || 0;
+        const minutes = Math.floor(seconds / 60);
+
+        statsMinutesEl.textContent = minutes;
+        statsUnitEl.textContent = minutes === 1 ? "minute" : "minutes";
+        statsDomainEl.textContent = currentDomain;
+    });
+};
 
 const updateTrackingBtn = () => {
     if (!currentDomain) return;
@@ -18,8 +37,8 @@ const updateTrackingBtn = () => {
     chrome.storage.local.get([STORAGE_KEYS.BLACKLIST], (res) => {
         const isBlacklisted = !!(res[STORAGE_KEYS.BLACKLIST] || {})[`domain_${currentDomain}`];
 
-        blacklistTabBtn.classList.toggle("hidden", isBlacklisted);
-        trackTabBtn.classList.toggle("hidden", !isBlacklisted);
+        blacklistTabBtn.classList.toggle("is-hidden", isBlacklisted);
+        trackTabBtn.classList.toggle("is-hidden", !isBlacklisted);
     });
 };
 
@@ -32,15 +51,16 @@ const showMessage = (text, type = "success") => {
     }, 12000);
 };
 
-const loadBlacklist = async () => {
+const loadBlacklist = () => {
     chrome.storage.local.get([STORAGE_KEYS.BLACKLIST], (res) => {
         const blacklist = res[STORAGE_KEYS.BLACKLIST] || {};
         const domains = Object.keys(blacklist)
             .map((key) => key.replace("domain_", ""))
             .filter((domain) => domain);
 
-        blacklistSection.classList.toggle("hidden", domains.length === 0);
-        clearAllBtn.classList.toggle("hidden", domains.length <= 1);
+        manageSitesBtn.classList.toggle("is-hidden", domains.length === 0);
+        clearAllBtn.classList.toggle("is-hidden", domains.length <= 1);
+        blacklistEmptyState.classList.toggle("is-hidden", domains.length > 0);
 
         blacklistContainer.querySelectorAll(".blacklist-item").forEach((el) => el.remove());
 
@@ -51,18 +71,16 @@ const loadBlacklist = async () => {
 
             item.className = "blacklist-item";
             item.innerHTML = `
-                <span>${domain.replace(/^www\./, "")}</span>
-                <button id="item-remove" class="pause-tab-btn destructive" data-domain="${domain}">Remove</button>
+                <span>${domain}</span>
+                <button class="item-remove pause-tab-btn destructive" data-domain="${domain}">Remove</button>
             `;
 
             blacklistContainer.appendChild(item);
         });
 
-        document.querySelectorAll("#item-remove").forEach((btn) => {
+        document.querySelectorAll(".item-remove").forEach((btn) => {
             btn.addEventListener("click", (e) => {
-                const domain = e.target.dataset.domain;
-
-                removeFromBlacklist(domain);
+                removeFromBlacklist(e.target.dataset.domain);
             });
         });
     });
@@ -104,20 +122,36 @@ blacklistTabBtn.addEventListener("click", () => {
 trackTabBtn.addEventListener("click", () => {
     if (currentDomain) {
         chrome.runtime.sendMessage({ type: "removeFromBlacklist", domain: currentDomain }, (response) => {
-            if (response?.success) loadBlacklist();
+            if (response?.success) {
+                loadBlacklist();
+                updateTrackingBtn();
+            }
         });
     }
 });
 
+manageSitesBtn.addEventListener("click", () => {
+    blacklistModal.showModal();
+});
+
+document.getElementById("btn-close-modal").addEventListener("click", () => {
+    blacklistModal.close();
+});
+
+blacklistModal.addEventListener("click", (e) => {
+    if (e.target === blacklistModal) blacklistModal.close();
+});
+
 clearAllBtn.addEventListener("click", clearAll);
 
-// Load blacklist on popup open
+// Init
 chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
     if (tab?.url) {
         try {
             currentDomain = new URL(tab.url).hostname.replace(/^www\./, "");
         } catch {}
     }
+    loadStats();
     updateTrackingBtn();
     loadBlacklist();
 });
