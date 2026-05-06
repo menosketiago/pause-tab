@@ -1,3 +1,11 @@
+/* RESET */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
 /* FONT IMPORT */
 
 @font-face {
@@ -109,12 +117,4 @@
         pointer-events: none;
         z-index: -1;
     }
-}
-
-/* RESET */
-
-*,
-*::before,
-*::after {
-    box-sizing: border-box;
 }

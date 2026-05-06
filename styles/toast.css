@@ -39,6 +39,7 @@
     background: var(--color-bg) linear-gradient(to right,
             hsl(from var(--color-bg) h s 20),
             var(--color-bg));
+    backdrop-filter: blur(12px);
     color: var(--color-text);
     border: var(--border-subtle);
     border-radius: var(--radius-extra);

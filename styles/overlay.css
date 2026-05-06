@@ -60,6 +60,12 @@
             width: 100%;
             margin-top: var(--space-large);
         }
+
+        &.bg-image {
+            &::before {
+                background-size: 200%;
+            }
+        }
     }
 }
 
