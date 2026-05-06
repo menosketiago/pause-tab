@@ -141,30 +141,35 @@
                 &[data-tooltip]::after {
                     content: attr(data-tooltip);
                     position: absolute;
-                    top: calc(100% + var(--space-tiny));
+                    bottom: 50%;
                     left: 0;
-                    right: 0;
-                    z-index: 10;
-                    padding: var(--space-small);
-                    background-color: var(--color-text);
-                    color: var(--color-bg);
+                    width: max-content;
+                    max-width: calc(var(--space-medium) * 30);
+                    margin-bottom: var(--space-tiny);
+                    padding: 6px 10px;
+                    background-color: var(--color-white);
+                    color: var(--color-text-inverse);
                     font-size: var(--font-size-small);
                     border-radius: var(--radius-default);
-                    word-break: break-all;
                     white-space: normal;
+                    word-break: break-all;
                     opacity: 0;
+                    transition: all var(--speed-default) ease-out;
+                    z-index: 10;
                     pointer-events: none;
-                    transition: opacity 0s;
                 }
 
                 &[data-tooltip]:hover::after {
+                    bottom: 100%;
                     opacity: 1;
                 }
             }
 
             .item-remove {
-                width: auto !important;
-                font-size: var(--font-size-small) !important;
+                width: auto;
+                min-height: auto;
+                padding: var(--space-medium);
+                font-size: var(--font-size-small);
             }
         }
 

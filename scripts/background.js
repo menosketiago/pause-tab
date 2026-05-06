@@ -245,13 +245,15 @@ const updateActiveTab = async () => {
 
     if (tab && tab.id) {
         activeTabId = tab.id;
-    } else {
+    } 
+    else {
         activeTabId = null;
     }
 
     if (tab) {
         activeDomain = getDomain(tab.url);
-    } else {
+    } 
+    else {
         activeDomain = null;
     }
 };
@@ -358,6 +360,7 @@ chrome.tabs.onActivated.addListener(async (info) => {
 
     activeTabId = info.tabId;
     activeDomain = getDomain(tab.url);
+
     updateContextMenus(activeDomain);
 });
 
@@ -373,7 +376,9 @@ chrome.tabs.onUpdated.addListener((id, change, tab) => {
     if (change.status === "complete") {
         chrome.tabs.get(id, (fullTab) => {
             if (chrome.runtime.lastError) return;
+
             injectTimeTracking(fullTab);
+
             if (fullTab.active) updateContextMenus(getDomain(fullTab.url));
         });
     }
@@ -382,12 +387,14 @@ chrome.tabs.onUpdated.addListener((id, change, tab) => {
 chrome.contextMenus.onClicked.addListener((info, tab) => {
     if (info.menuItemId === "pause-this-tab") {
         injectPauseModal(tab);
-    } else if (
+    }
+    else if (
         info.menuItemId === "ignore-domain" ||
         info.menuItemId === "ignore-domain-action"
     ) {
         addDomainToBlacklist(tab);
-    } else if (
+    }
+    else if (
         info.menuItemId === "track-domain" ||
         info.menuItemId === "track-domain-action"
     ) {
@@ -398,6 +405,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 
 const addDomainToBlacklist = async (tab) => {
     const domain = getDomain(tab.url);
+
     if (!domain) return;
 
     const domainKey = `domain_${domain}`;
@@ -405,8 +413,10 @@ const addDomainToBlacklist = async (tab) => {
     const blacklist = res[STORAGE_KEYS.BLACKLIST] || {};
 
     blacklist[domainKey] = true;
+
     await chrome.storage.local.set({ [STORAGE_KEYS.BLACKLIST]: blacklist });
-    chrome.runtime.sendMessage({ type: "blacklistUpdated" }).catch(() => {});
+    chrome.runtime.sendMessage({ type: "blacklistUpdated" }).catch(() => { });
+
     updateContextMenus(domain);
 };
 
@@ -417,7 +427,8 @@ const removeDomainFromBlacklist = async (domain) => {
 
     delete blacklist[domainKey];
     await chrome.storage.local.set({ [STORAGE_KEYS.BLACKLIST]: blacklist });
-    chrome.runtime.sendMessage({ type: "blacklistUpdated" }).catch(() => {});
+    chrome.runtime.sendMessage({ type: "blacklistUpdated" }).catch(() => { });
+
     updateContextMenus(domain);
 };
 
@@ -439,38 +450,49 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
             if (msg.status === "paused") {
                 paused[domainKey] = true;
-            } else {
+            }
+            else {
                 delete paused[domainKey];
             }
 
             chrome.storage.local.set({ [STORAGE_KEYS.PAUSED]: paused });
         });
-    } else if (msg.type === "addToBlacklist") {
+    }
+    else if (msg.type === "addToBlacklist") {
         addDomainToBlacklist({ url: `https://${msg.domain}` }).then(() => {
             sendResponse({ success: true });
         });
+
         return true;
-    } else if (msg.type === "removeFromBlacklist") {
+    }
+    else if (msg.type === "removeFromBlacklist") {
         removeDomainFromBlacklist(msg.domain).then(() => {
             sendResponse({ success: true });
         });
+
         return true;
-    } else if (msg.type === "getBlacklist") {
+    }
+    else if (msg.type === "getBlacklist") {
         chrome.storage.local.get([STORAGE_KEYS.BLACKLIST], (res) => {
             sendResponse({ blacklist: res[STORAGE_KEYS.BLACKLIST] || {} });
         });
+
         return true;
-    } else if (msg.type === "pauseCurrentTab") {
+    }
+    else if (msg.type === "pauseCurrentTab") {
         if (activeTabId) {
             chrome.tabs.get(activeTabId, (tab) => {
                 if (chrome.runtime.lastError) return;
+
                 injectPauseModal(tab);
             });
         }
-    } else if (msg.type === "blacklistCurrentTab") {
+    }
+    else if (msg.type === "blacklistCurrentTab") {
         if (activeTabId) {
             chrome.tabs.get(activeTabId, (tab) => {
                 if (chrome.runtime.lastError) return;
+
                 addDomainToBlacklist(tab);
             });
         }
