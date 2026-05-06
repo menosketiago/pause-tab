@@ -1,16 +1,95 @@
 const STORAGE_KEYS = {
     BLACKLIST: "blacklistedDomains",
+    TIME: "timeTracking",
 };
 
-const blacklistSection = document.getElementById("section-blacklist");
+const pagesWrapper = document.getElementById("pages-wrapper");
+const pageMain = document.getElementById("page-main");
+const pageManageSites = document.getElementById("page-manage-sites");
+
+// CSS can't transition height: auto, so we keep it in px and update manually
+const updateHeight = () => {
+    const activePage = pagesWrapper.classList.contains("show-manage-sites")
+        ? pageManageSites
+        : pageMain;
+    pagesWrapper.style.height = `${activePage.scrollHeight}px`;
+};
+
+const navigateTo = (showManage) => {
+    // Snapshot current px height so the transition has a concrete from-value
+    pagesWrapper.style.height = `${pagesWrapper.offsetHeight}px`;
+    pagesWrapper.offsetHeight; // force layout so transition has a from-value
+    pagesWrapper.classList.toggle("show-manage-sites", showManage);
+    const target = showManage ? pageManageSites : pageMain;
+    pagesWrapper.style.height = `${target.scrollHeight}px`;
+};
+
 const blacklistContainer = document.getElementById("container-blacklist");
+const blacklistEmptyState = document.getElementById("blacklist-empty-state");
 const clearAllBtn = document.getElementById("btn-clear-all");
 const pauseTabBtn = document.getElementById("btn-pause-tab");
 const blacklistTabBtn = document.getElementById("btn-blacklist-tab");
 const trackTabBtn = document.getElementById("btn-track-tab");
+const manageSitesBtn = document.getElementById("btn-manage-sites");
+const statsEl = document.querySelector("#page-main .stats");
+const pillTrackingDisabled = document.getElementById("pill-tracking-disabled");
+const statsMinutesEl = document.getElementById("stats-big-number");
+const statsUnitEl = document.getElementById("stats-unit");
+const statsDomainEl = document.getElementById("stats-domain");
 const messageEl = document.getElementById("message");
 
 let currentDomain = null;
+let lastStatsValue = null;
+
+const loadStats = () => {
+    if (!currentDomain) return;
+
+    chrome.storage.local.get([STORAGE_KEYS.TIME], (res) => {
+        const seconds = (res[STORAGE_KEYS.TIME] || {})[`domain_${currentDomain}`] || 0;
+        const totalMinutes = Math.floor(seconds / 60);
+
+        let displayValue, unitText;
+
+        if (seconds < 60) {
+            displayValue = seconds;
+            unitText = seconds === 1 ? "second" : "seconds";
+        }
+        else if (totalMinutes < 60) {
+            displayValue = totalMinutes;
+            unitText = totalMinutes === 1 ? "minute" : "minutes";
+        }
+        else {
+            displayValue = totalMinutes;
+            const hours = Math.floor(totalMinutes / 60);
+            const mins = totalMinutes % 60;
+            unitText = `minutes (${hours}h ${mins}m)`;
+        }
+
+        if (displayValue !== lastStatsValue) {
+            const prevStr = lastStatsValue !== null ? String(lastStatsValue) : "";
+            const newStr = String(displayValue);
+            const maxLen = Math.max(prevStr.length, newStr.length);
+            // Right-align both strings so digit positions stay in sync when length changes (e.g. 9 → 10)
+            const paddedPrev = prevStr.padStart(maxLen, " ");
+
+            // Only wrap digits that actually changed in a span to trigger the flip animation
+            statsMinutesEl.innerHTML = newStr
+                .split("")
+                .map((char, i) => {
+                    const prevChar = paddedPrev[maxLen - newStr.length + i];
+                    return char !== prevChar
+                        ? `<span style="animation-delay:${i * 40}ms">${char}</span>`
+                        : char;
+                })
+                .join("");
+
+            lastStatsValue = displayValue;
+        }
+
+        statsUnitEl.textContent = unitText;
+        statsDomainEl.textContent = currentDomain;
+    });
+};
 
 const updateTrackingBtn = () => {
     if (!currentDomain) return;
@@ -18,8 +97,10 @@ const updateTrackingBtn = () => {
     chrome.storage.local.get([STORAGE_KEYS.BLACKLIST], (res) => {
         const isBlacklisted = !!(res[STORAGE_KEYS.BLACKLIST] || {})[`domain_${currentDomain}`];
 
-        blacklistTabBtn.classList.toggle("hidden", isBlacklisted);
-        trackTabBtn.classList.toggle("hidden", !isBlacklisted);
+        pillTrackingDisabled.classList.toggle("is-hidden", !isBlacklisted);
+        blacklistTabBtn.classList.toggle("is-hidden", isBlacklisted);
+        trackTabBtn.classList.toggle("is-hidden", !isBlacklisted);
+        updateHeight();
     });
 };
 
@@ -32,15 +113,16 @@ const showMessage = (text, type = "success") => {
     }, 12000);
 };
 
-const loadBlacklist = async () => {
+const loadBlacklist = () => {
     chrome.storage.local.get([STORAGE_KEYS.BLACKLIST], (res) => {
         const blacklist = res[STORAGE_KEYS.BLACKLIST] || {};
         const domains = Object.keys(blacklist)
             .map((key) => key.replace("domain_", ""))
             .filter((domain) => domain);
 
-        blacklistSection.classList.toggle("hidden", domains.length === 0);
-        clearAllBtn.classList.toggle("hidden", domains.length <= 1);
+        manageSitesBtn.classList.toggle("is-hidden", domains.length === 0);
+        clearAllBtn.classList.toggle("is-hidden", domains.length <= 1);
+        blacklistEmptyState.classList.toggle("is-hidden", domains.length > 0);
 
         blacklistContainer.querySelectorAll(".blacklist-item").forEach((el) => el.remove());
 
@@ -48,23 +130,35 @@ const loadBlacklist = async () => {
 
         domains.forEach((domain) => {
             const item = document.createElement("div");
-
             item.className = "blacklist-item";
-            item.innerHTML = `
-                <span>${domain.replace(/^www\./, "")}</span>
-                <button id="item-remove" class="pause-tab-btn destructive" data-domain="${domain}">Remove</button>
-            `;
+            
+            // 1. Create the span explicitly so we can measure it
+            const span = document.createElement("span");
+            span.textContent = domain;
+            
+            const button = document.createElement("button");
+            button.className = "pause-tab-btn secondary item-remove";
+            button.dataset.domain = domain;
+            button.textContent = "Remove";
 
+            item.appendChild(span);
+            item.appendChild(button);
             blacklistContainer.appendChild(item);
+
+            // 2. Logic: Only add the title attribute if the text is truncated
+            // Note: This must happen AFTER item is appended to the container
+            if (span.scrollWidth > span.clientWidth) {
+                span.setAttribute("data-tooltip", domain);
+            }
         });
 
-        document.querySelectorAll("#item-remove").forEach((btn) => {
+        document.querySelectorAll(".item-remove").forEach((btn) => {
             btn.addEventListener("click", (e) => {
-                const domain = e.target.dataset.domain;
-
-                removeFromBlacklist(domain);
+                removeFromBlacklist(e.target.dataset.domain);
             });
         });
+
+        updateHeight();
     });
 };
 
@@ -92,9 +186,8 @@ const clearAll = () => {
 
 // Event listeners
 pauseTabBtn.addEventListener("click", () => {
-    chrome.runtime.sendMessage({ type: "pauseCurrentTab" }, () => {
-        window.close();
-    });
+    chrome.runtime.sendMessage({ type: "pauseCurrentTab" });
+    window.close();
 });
 
 blacklistTabBtn.addEventListener("click", () => {
@@ -104,28 +197,38 @@ blacklistTabBtn.addEventListener("click", () => {
 trackTabBtn.addEventListener("click", () => {
     if (currentDomain) {
         chrome.runtime.sendMessage({ type: "removeFromBlacklist", domain: currentDomain }, (response) => {
-            if (response?.success) loadBlacklist();
+            if (response?.success) {
+                loadBlacklist();
+                updateTrackingBtn();
+            }
         });
     }
 });
 
+manageSitesBtn.addEventListener("click", () => navigateTo(true));
+
+document.getElementById("btn-back").addEventListener("click", () => navigateTo(false));
+
 clearAllBtn.addEventListener("click", clearAll);
 
-// Load blacklist on popup open
+// Init
 chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
     if (tab?.url) {
         try {
             currentDomain = new URL(tab.url).hostname.replace(/^www\./, "");
         } catch {}
     }
+    loadStats();
     updateTrackingBtn();
     loadBlacklist();
 });
 
-// Listen for updates from context menu
+// Listen for updates triggered by the context menu (outside the popup)
 chrome.runtime.onMessage.addListener((msg) => {
     if (msg.type === "blacklistUpdated") {
         loadBlacklist();
         updateTrackingBtn();
     }
 });
+
+setInterval(loadStats, 1000);

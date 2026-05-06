@@ -8,136 +8,115 @@ const injectPauseModal = (tab) => {
         tab.url.startsWith("chrome://") ||
         tab.url.includes("chrome.google.com/webstore")
     ) {
-        console.warn(
-            "Pause Tab: Action blocked on restricted Google/System pages.",
-        );
+        console.warn("Pause Tab: Action blocked on restricted Google/System pages.");
         return;
     }
-
-    chrome.scripting
-        .insertCSS({
-            target: { tabId: tab.id },
-            files: ["styles/index.css"],
-        })
-        .catch((err) => console.error("CSS Injection failed:", err));
 
     chrome.scripting.executeScript({
         target: { tabId: tab.id },
         func: () => {
-            const scrollBarWidth =
-                window.innerWidth - document.documentElement.clientWidth;
-            const originalOverflow = document.body.style.overflow;
-            const originalPadding = document.body.style.paddingRight;
-            const fontUrl = chrome.runtime.getURL(
-                "fonts/Nunito-VariableFont_wght.ttf",
-            );
-            const styleBlock = document.createElement("style");
-            const overlay = document.createElement("div");
+            if (document.getElementById("pause-tab-overlay-host")) return;
 
-            let timer, interval, remaining;
+            (async () => {
+                const [globalCss, componentsCss, overlayCss] = await Promise.all([
+                    fetch(chrome.runtime.getURL("styles/global.css")).then((r) => r.text()),
+                    fetch(chrome.runtime.getURL("styles/components.css")).then((r) => r.text()),
+                    fetch(chrome.runtime.getURL("styles/overlay.css")).then((r) => r.text()),
+                ]);
 
-            let isHolding = false;
+                const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
+                const originalOverflow = document.body.style.overflow;
+                const originalPadding = document.body.style.paddingRight;
 
-            const start = (e) => {
-                if (e.code === "Space") e.preventDefault();
+                if (scrollBarWidth > 0) document.body.style.paddingRight = `${scrollBarWidth}px`;
+                document.body.style.overflow = "hidden";
 
-                if (isHolding || e.repeat) return;
+                chrome.runtime.sendMessage({ type: "pauseStateChanged", status: "paused" });
 
-                isHolding = true;
-                remaining = 5;
+                const host = document.createElement("div");
+                host.id = "pause-tab-overlay-host";
+                document.body.appendChild(host);
 
-                btn.classList.add("is-holding");
-                btn.innerText = remaining;
+                const shadow = host.attachShadow({ mode: "open" });
 
-                interval = setInterval(() => {
-                    remaining--;
+                const style = document.createElement("style");
+                style.textContent = [globalCss, componentsCss, overlayCss].join("\n");
+                shadow.appendChild(style);
 
-                    if (remaining > 0) {
-                        btn.innerText = remaining;
-                    } else {
-                        btn.innerText = "";
-                    }
-                }, 1000);
+                const overlay = document.createElement("div");
+                overlay.id = "pause-tab-overlay";
+                overlay.setAttribute("role", "dialog");
+                overlay.setAttribute("aria-modal", "true");
+                overlay.setAttribute("tabindex", "-1");
+                overlay.innerHTML = `
+                    <article>
+                        <h1>Tab paused</h1>
+                        <p>When you are ready, hold the button below for 5 seconds to resume.</p>
+                        <footer>
+                            <button id="resume-button" class="pause-tab-btn primary">Hold to resume</button>
+                        </footer>
+                    </article>
+                `;
+                shadow.appendChild(overlay);
+                overlay.focus();
 
-                timer = setTimeout(() => {
-                    // Restore original scroll settings
-                    document.body.style.overflow = originalOverflow;
-                    document.body.style.paddingRight = originalPadding;
+                const btn = shadow.querySelector("#resume-button");
 
-                    overlay.remove();
-                    styleBlock.remove();
+                let timer, interval, remaining;
+                let isHolding = false;
+
+                const start = (e) => {
+                    if (e.code === "Space") e.preventDefault();
+                    if (isHolding || e.repeat) return;
+
+                    isHolding = true;
+                    remaining = 5;
+                    btn.classList.add("is-holding");
+                    btn.innerText = remaining;
+
+                    interval = setInterval(() => {
+                        remaining--;
+                        btn.innerText = remaining > 0 ? remaining : "";
+                    }, 1000);
+
+                    timer = setTimeout(() => {
+                        document.body.style.overflow = originalOverflow;
+                        document.body.style.paddingRight = originalPadding;
+                        host.remove();
+                        clearInterval(interval);
+                        chrome.runtime.sendMessage({ type: "pauseStateChanged", status: "resumed" });
+                        window.removeEventListener("keydown", keydownHandler);
+                        window.removeEventListener("keyup", keyupHandler);
+                    }, 5000);
+                };
+
+                const stop = (e) => {
+                    if (e.code === "Space") e.preventDefault();
+                    isHolding = false;
+                    clearTimeout(timer);
                     clearInterval(interval);
-                    chrome.runtime.sendMessage({
-                        type: "pauseStateChanged",
-                        status: "resumed",
-                    });
-                    window.removeEventListener("keydown", keydownHandler);
-                    window.removeEventListener("keyup", keyupHandler);
-                }, 5000);
-            };
+                    btn.classList.remove("is-holding");
+                    btn.innerText = "Hold to resume";
+                };
 
-            const stop = (e) => {
-                if (e.code === "Space") e.preventDefault();
-                isHolding = false;
-                clearTimeout(timer);
-                clearInterval(interval);
-                btn.classList.remove("is-holding");
-                btn.innerText = "Hold to resume";
-            };
+                const keydownHandler = (e) => {
+                    if (e.code === "Space") start(e);
+                };
 
-            const keydownHandler = (e) => {
-                if (e.code === "Space") start(e);
-            };
+                const keyupHandler = (e) => {
+                    if (e.code === "Space") stop(e);
+                };
 
-            const keyupHandler = (e) => {
-                if (e.code === "Space") stop(e);
-            };
-
-            if (document.getElementById("pause-tab-overlay")) return;
-
-            // Calculate scrollbar width to prevent page jump
-            if (scrollBarWidth > 0)
-                document.body.style.paddingRight = `${scrollBarWidth}px`;
-
-            document.body.style.overflow = "hidden";
-
-            // Notify background to stop timer
-            chrome.runtime.sendMessage({
-                type: "pauseStateChanged",
-                status: "paused",
-            });
-
-            styleBlock.textContent = `@font-face { font-family: 'Nunito'; src: url('${fontUrl}') format('truetype'); font-weight: 200 1000; }`;
-            document.head.appendChild(styleBlock);
-
-            overlay.id = "pause-tab-overlay";
-            overlay.setAttribute("role", "dialog");
-            overlay.setAttribute("aria-modal", "true");
-            overlay.setAttribute("tabindex", "-1");
-
-            overlay.innerHTML = `
-                <article>
-                    <h1>Tab paused</h1>
-                    <p>When you are ready, hold the button below for 5 seconds to resume.</p>
-                    <footer>
-                        <button id="resume-button" class="pause-tab-btn primary">Hold to resume</button>
-                    </footer>
-                </article>
-            `;
-            document.body.appendChild(overlay);
-            overlay.focus();
-
-            const btn = overlay.querySelector("#resume-button");
-
-            btn.addEventListener("mousedown", start);
-            btn.addEventListener("touchstart", start);
-            btn.addEventListener("mouseup", stop);
-            btn.addEventListener("mouseleave", stop);
-            btn.addEventListener("touchend", stop);
-            window.addEventListener("keydown", keydownHandler);
-            window.addEventListener("keyup", keyupHandler);
+                btn.addEventListener("mousedown", start);
+                btn.addEventListener("touchstart", start);
+                btn.addEventListener("mouseup", stop);
+                btn.addEventListener("mouseleave", stop);
+                btn.addEventListener("touchend", stop);
+                window.addEventListener("keydown", keydownHandler);
+                window.addEventListener("keyup", keyupHandler);
+            })();
         },
-    });
+    }).catch((err) => console.error("Pause Tab: Script injection failed:", err));
 };
 
 // TIME TOAST
@@ -154,25 +133,23 @@ const injectTimeTracking = (tab) => {
         return;
 
     chrome.scripting
-        .insertCSS({
-            target: { tabId: tab.id },
-            files: ["styles/index.css"],
-        })
-        .catch(() => { });
-
-    chrome.scripting
         .executeScript({
             target: { tabId: tab.id },
             func: (domain, favIconUrl) => {
-                let overlayElement,
-                    toastContainer,
-                    container,
-                    toast,
-                    content,
-                    timeTracking,
-                    time;
-
                 if (window.pauseTabInterval) clearInterval(window.pauseTabInterval);
+
+                // CSS is fetched once and cached for subsequent toasts
+                let css = null;
+                const getCss = async () => {
+                    if (css) return css;
+                    const [a, b, c] = await Promise.all([
+                        fetch(chrome.runtime.getURL("styles/global.css")).then((r) => r.text()),
+                        fetch(chrome.runtime.getURL("styles/components.css")).then((r) => r.text()),
+                        fetch(chrome.runtime.getURL("styles/toast.css")).then((r) => r.text()),
+                    ]);
+                    css = [a, b, c].join("\n");
+                    return css;
+                };
 
                 window.pauseTabInterval = setInterval(() => {
                     if (!chrome.runtime || !chrome.runtime.id) {
@@ -180,8 +157,8 @@ const injectTimeTracking = (tab) => {
                         return;
                     }
 
-                    overlayElement = document.getElementById("pause-tab-overlay");
-                    if (overlayElement) return;
+                    // Pause overlay takes priority — don't show toast while paused
+                    if (document.getElementById("pause-tab-overlay-host")) return;
 
                     chrome.storage.local.get(["timeTracking"], (res) => {
                         if (chrome.runtime.lastError) {
@@ -189,45 +166,44 @@ const injectTimeTracking = (tab) => {
                             return;
                         }
 
-                        timeTracking = res.timeTracking || {};
-                        time = timeTracking[`domain_${domain}`] || 0;
+                        const timeTracking = res.timeTracking || {};
+                        const time = timeTracking[`domain_${domain}`] || 0;
 
                         // Trigger toast every 15 minutes (900 seconds)
                         if (time > 0 && time % 900 === 0) {
-                            toastContainer = document.getElementById(
-                                "pause-tab-toast-container",
-                            );
-                            if (toastContainer) return;
-
+                            if (document.getElementById("pause-tab-toast-host")) return;
                             if (!document.body) return;
 
-                            // Create Container for the glow
-                            container = document.createElement("div");
-                            container.id = "pause-tab-toast-container";
+                            getCss().then((cssText) => {
+                                const host = document.createElement("div");
+                                host.id = "pause-tab-toast-host";
+                                document.body.appendChild(host);
 
-                            // Create the actual toast
-                            toast = document.createElement("div");
-                            toast.id = "pause-tab-toast";
+                                const shadow = host.attachShadow({ mode: "open" });
 
-                            content = "";
+                                const style = document.createElement("style");
+                                style.textContent = cssText;
+                                shadow.appendChild(style);
 
-                            if (favIconUrl && typeof favIconUrl === "string") {
-                                content = `<img src="${favIconUrl}" />`;
-                            }
+                                const container = document.createElement("div");
+                                container.id = "pause-tab-toast-container";
 
-                            content += `<span>Used for ${Math.floor(time / 60)}m</span>`;
+                                const toast = document.createElement("div");
+                                toast.id = "pause-tab-toast";
 
-                            toast.innerHTML = content;
-                            container.appendChild(toast);
-                            document.body.appendChild(container);
+                                let content = "";
+                                if (favIconUrl && typeof favIconUrl === "string") {
+                                    content = `<img src="${favIconUrl}" />`;
+                                }
+                                content += `<span>Used for ${Math.floor(time / 60)}m</span>`;
+                                toast.innerHTML = content;
 
-                            setTimeout(() => {
-                                if (container && container.parentNode) container.remove();
-                            }, 12000);
+                                container.appendChild(toast);
+                                shadow.appendChild(container);
 
-                            // Dismiss on click
-                            container.addEventListener("click", () => {
-                                if (container && container.parentNode) container.remove();
+                                const remove = () => { if (host.parentNode) host.remove(); };
+                                setTimeout(remove, 12000);
+                                host.addEventListener("click", remove);
                             });
                         }
                     });
@@ -339,7 +315,7 @@ chrome.runtime.onInstalled.addListener(async () => {
 
     chrome.contextMenus.create({
         id: "track-domain",
-        title: "Track time on this site",
+        title: "Resume tracking this site",
         contexts: ["page"],
     });
 
@@ -351,7 +327,7 @@ chrome.runtime.onInstalled.addListener(async () => {
 
     chrome.contextMenus.create({
         id: "track-domain-action",
-        title: "Track time on this site",
+        title: "Resume tracking this site",
         contexts: ["action"],
     });
 

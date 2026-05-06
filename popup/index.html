@@ -6,34 +6,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pause Tab Settings</title>
 
-    <link rel="stylesheet" href="../styles/index.css" />
+    <link rel="stylesheet" href="../styles/global.css" />
+    <link rel="stylesheet" href="../styles/components.css" />
+    <link rel="stylesheet" href="../styles/popup.css" />
 </head>
 
 <body>
-    <section>
-        <button class="pause-tab-btn primary" id="btn-pause-tab">
-            Pause this tab
-        </button>
+    <div id="pages-wrapper">
+        <div id="page-main">
+            <section class="stats">
+                <output id="stats-big-number">--</output>
 
-        <button class="pause-tab-btn" id="btn-blacklist-tab">
-            Don't time track this site
-        </button>
-        <button class="pause-tab-btn hidden" id="btn-track-tab">
-            Track this site again
-        </button>
-    </section>
+                <p><span id="stats-unit">minutes</span> spent on<br><strong id="stats-domain"></strong> today</p>
 
-    <section class="hidden" id="section-blacklist">
-        <h2>Sites not being tracked</h2>
+                <div id="pill-tracking-disabled" class="pause-tab-pill is-hidden">Tracking disabled</div>
+            </section>
 
-        <div class="blacklist-list" id="container-blacklist"></div>
+            <section>
+                <button class="pause-tab-btn primary" id="btn-pause-tab">
+                    Pause tab
+                </button>
 
-        <button class="pause-tab-btn destructive hidden" id="btn-clear-all">
-            Remove all sites
-        </button>
-    </section>
+                <button class="pause-tab-btn secondary" id="btn-blacklist-tab">
+                    Don't track this site
+                </button>
+                <button class="pause-tab-btn secondary is-hidden" id="btn-track-tab">
+                    Resume tracking this site
+                </button>
+            </section>
 
-    <div id="message"></div>
+            <button id="btn-manage-sites" class="pause-tab-btn is-hidden">Manage untracked sites →</button>
+        </div>
+
+        <div id="page-manage-sites">
+            <header>
+                <h1>Untracked sites</h1>
+
+                <button id="btn-back" class="pause-tab-btn secondary close" aria-label="Back"></button>
+            </header>
+
+            <div class="blacklist-list" id="container-blacklist">
+                <div class="empty-state" id="blacklist-empty-state">All sites are being tracked 🕵️‍♀️</div>
+            </div>
+
+            <button class="pause-tab-btn destructive is-hidden" id="btn-clear-all">
+                Remove all
+            </button>
+
+            <div id="message"></div>
+        </div>
+    </div>
 
     <script src="../scripts/popup.js"></script>
 </body>

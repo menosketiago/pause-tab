@@ -1,0 +1,65 @@
+/* OVERLAY STYLES */
+
+#pause-tab-overlay {
+    position: fixed !important;
+    inset: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    background-color: var(--color-overlay-bg) !important;
+    color: var(--color-text) !important;
+    font-family: var(--font-family) !important;
+    font-size: var(--font-size-base) !important;
+    font-optical-sizing: auto !important;
+    backdrop-filter: blur(12px) !important;
+    z-index: 2147483647 !important;
+    pointer-events: all !important;
+
+    &:focus-visible {
+        outline: none !important;
+    }
+
+    article {
+        position: relative !important;
+        display: flex !important;
+        flex-direction: column !important;
+        width: 360px !important;
+        padding: var(--space-large) !important;
+        background: var(--color-bg) linear-gradient(340deg,
+                hsl(from var(--color-bg) h s 0.12) -120%,
+                var(--color-bg)) !important;
+        border: var(--border-subtle) !important;
+        border-radius: var(--radius-large) !important;
+        text-align: center !important;
+
+        @supports (corner-shape: squircle) {
+            corner-shape: squircle;
+        }
+
+        h1 {
+            margin: 0 0 var(--space-medium) !important;
+            font-size: 1.5em !important;
+            font-weight: var(--font-weight-extra) !important;
+            line-height: 120% !important;
+        }
+
+        p {
+            margin-bottom: var(--space-medium) !important;
+            line-height: 140% !important;
+            text-wrap: pretty !important;
+
+            &:last-of-type {
+                margin-bottom: var(--space-small) !important;
+            }
+        }
+
+        footer {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: var(--space-small) !important;
+            width: 100% !important;
+            margin-top: var(--space-large) !important;
+        }
+    }
+}

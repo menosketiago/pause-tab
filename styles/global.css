@@ -1,0 +1,96 @@
+/* FONT IMPORT */
+
+@font-face {
+    font-family: "Inter";
+    src: url("../fonts/Inter-VariableFont_opsz,wght.ttf") format("truetype");
+    font-weight: 100 900;
+    font-style: normal;
+}
+
+/* VARIABLES */
+
+:root {
+    --color-black: #222222;
+    --color-white: #f5f5f5;
+
+    /* Pastel Dreamland Adventure */
+    --color-thistle: #cdb4db;
+    --color-pastel-petal: #ffc8dd;
+    --color-baby-pink: #ffafcc;
+    --color-icy-blue: #bde0fe;
+    --color-sky-blue: #a2d2ff;
+
+    --color-mint: #b5ead7;
+
+    /* Sizes */
+    --space-tiny: 4px;
+    --space-small: 8px;
+    --space-medium: 12px;
+    --space-large: 24px;
+    --space-extra: 48px;
+
+    --touch-target: 48px;
+
+    --popup-width: calc(var(--space-medium) * 40);
+
+    /* Radii */
+    --radius-default: 8px;
+    --radius-large: calc(var(--radius-default) * 3);
+    --radius-extra: calc(var(--radius-default) * 6);
+    --radius-round: 9999px;
+
+    /* Typography */
+    --font-family: "Inter", sans-serif;
+    --font-size-base: 14px;
+    --font-size-small: 0.875em;
+    --font-size-large: 1.25em;
+    --font-size-extra: 1.5625em;
+    --font-weight-normal: 500;
+    --font-weight-bold: 600;
+    --font-weight-extra: 800;
+
+    /* Speeds */
+    --speed-default: 0.2s;
+    --speed-slow: 0.4s;
+    --speed-pulse: 5s;
+
+    /* Blur */
+    --blur-radius: var(--space-large);
+
+    /* Semantic */
+    --color-bg: var(--color-black);
+    --color-text: var(--color-white);
+    --color-text-subtle: color-mix(in hsl, var(--color-text) 80%, transparent);
+    --color-text-inverse: var(--color-black);
+    --color-accent: var(--color-sky-blue);
+
+    --color-overlay-bg: color-mix(in hsl, var(--color-bg) 60%, transparent);
+
+    --border-subtle: 1px solid color-mix(in hsl, var(--color-text) 12%, transparent);
+
+    /* Buttons */
+    --btn-primary-bg: var(--color-accent);
+    --btn-primary-text: var(--color-text-inverse);
+
+    --btn-secondary-bg: color-mix(in hsl,
+            var(--btn-primary-bg) 15%,
+            transparent);
+    --btn-secondary-text: var(--color-text);
+
+    --btn-destructive-bg: var(--color-baby-pink);
+    --btn-destructive-text: var(--color-black);
+
+    --btn-padding: var(--space-medium) var(--space-large);
+    --btn-radius: var(--radius-default);
+
+    /* Pill */
+    --color-pill-bg: var(--color-baby-pink);
+}
+
+/* RESET */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
