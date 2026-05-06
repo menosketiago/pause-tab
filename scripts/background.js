@@ -1,6 +1,20 @@
 // PAUSE OVERLAY
 
-const injectPauseModal = (tab) => {
+// Fetches CSS files in the background (full extension access) and rewrites
+// relative asset URLs to absolute chrome-extension:// URLs before passing to pages
+const fetchCss = async (...paths) => {
+    const extBase = chrome.runtime.getURL("");
+    const texts = await Promise.all(
+        paths.map((p) => fetch(chrome.runtime.getURL(p)).then((r) => r.text()))
+    );
+    return texts.join("\n")
+        .replace(/url\(["']?\.\.\//g, `url("${extBase}`)
+        // :root doesn't match in shadow trees (shadow root is a DocumentFragment, not an element)
+        // :host matches the shadow host and lets custom properties cascade into the tree
+        .replace(/:root\b/g, ":host");
+};
+
+const injectPauseModal = async (tab) => {
     if (
         !tab ||
         !tab.id ||
@@ -12,116 +26,111 @@ const injectPauseModal = (tab) => {
         return;
     }
 
+    const css = await fetchCss("styles/global.css", "styles/components.css", "styles/overlay.css");
+
     chrome.scripting.executeScript({
         target: { tabId: tab.id },
-        func: () => {
+        func: (css) => {
             if (document.getElementById("pause-tab-overlay-host")) return;
 
-            (async () => {
-                const [globalCss, componentsCss, overlayCss] = await Promise.all([
-                    fetch(chrome.runtime.getURL("styles/global.css")).then((r) => r.text()),
-                    fetch(chrome.runtime.getURL("styles/components.css")).then((r) => r.text()),
-                    fetch(chrome.runtime.getURL("styles/overlay.css")).then((r) => r.text()),
-                ]);
+            const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
+            const originalOverflow = document.body.style.overflow;
+            const originalPadding = document.body.style.paddingRight;
 
-                const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
-                const originalOverflow = document.body.style.overflow;
-                const originalPadding = document.body.style.paddingRight;
+            if (scrollBarWidth > 0) document.body.style.paddingRight = `${scrollBarWidth}px`;
+            document.body.style.overflow = "hidden";
 
-                if (scrollBarWidth > 0) document.body.style.paddingRight = `${scrollBarWidth}px`;
-                document.body.style.overflow = "hidden";
+            chrome.runtime.sendMessage({ type: "pauseStateChanged", status: "paused" });
 
-                chrome.runtime.sendMessage({ type: "pauseStateChanged", status: "paused" });
+            const host = document.createElement("div");
+            host.id = "pause-tab-overlay-host";
+            document.body.appendChild(host);
 
-                const host = document.createElement("div");
-                host.id = "pause-tab-overlay-host";
-                document.body.appendChild(host);
+            const shadow = host.attachShadow({ mode: "open" });
 
-                const shadow = host.attachShadow({ mode: "open" });
+            const style = document.createElement("style");
+            style.textContent = css;
+            shadow.appendChild(style);
 
-                const style = document.createElement("style");
-                style.textContent = [globalCss, componentsCss, overlayCss].join("\n");
-                shadow.appendChild(style);
+            const overlay = document.createElement("div");
+            overlay.id = "pause-tab-overlay";
+            overlay.setAttribute("role", "dialog");
+            overlay.setAttribute("aria-modal", "true");
+            overlay.setAttribute("tabindex", "-1");
+            overlay.innerHTML = `
+                <article>
+                    <h1>Tab paused</h1>
+                    <p>When you are ready, hold the button below for 5 seconds to resume.</p>
+                    <footer>
+                        <button id="resume-button" class="pause-tab-btn primary">Hold to resume</button>
+                    </footer>
+                </article>
+            `;
+            shadow.appendChild(overlay);
+            overlay.focus();
 
-                const overlay = document.createElement("div");
-                overlay.id = "pause-tab-overlay";
-                overlay.setAttribute("role", "dialog");
-                overlay.setAttribute("aria-modal", "true");
-                overlay.setAttribute("tabindex", "-1");
-                overlay.innerHTML = `
-                    <article>
-                        <h1>Tab paused</h1>
-                        <p>When you are ready, hold the button below for 5 seconds to resume.</p>
-                        <footer>
-                            <button id="resume-button" class="pause-tab-btn primary">Hold to resume</button>
-                        </footer>
-                    </article>
-                `;
-                shadow.appendChild(overlay);
-                overlay.focus();
+            const btn = shadow.querySelector("#resume-button");
 
-                const btn = shadow.querySelector("#resume-button");
+            let timer, interval, remaining;
+            let isHolding = false;
 
-                let timer, interval, remaining;
-                let isHolding = false;
+            const start = (e) => {
+                if (e.code === "Space") e.preventDefault();
+                if (isHolding || e.repeat) return;
 
-                const start = (e) => {
-                    if (e.code === "Space") e.preventDefault();
-                    if (isHolding || e.repeat) return;
+                isHolding = true;
+                remaining = 5;
+                btn.classList.add("is-holding");
+                btn.innerText = remaining;
 
-                    isHolding = true;
-                    remaining = 5;
-                    btn.classList.add("is-holding");
-                    btn.innerText = remaining;
+                interval = setInterval(() => {
+                    remaining--;
+                    btn.innerText = remaining > 0 ? remaining : "";
+                }, 1000);
 
-                    interval = setInterval(() => {
-                        remaining--;
-                        btn.innerText = remaining > 0 ? remaining : "";
-                    }, 1000);
-
-                    timer = setTimeout(() => {
-                        document.body.style.overflow = originalOverflow;
-                        document.body.style.paddingRight = originalPadding;
-                        host.remove();
-                        clearInterval(interval);
-                        chrome.runtime.sendMessage({ type: "pauseStateChanged", status: "resumed" });
-                        window.removeEventListener("keydown", keydownHandler);
-                        window.removeEventListener("keyup", keyupHandler);
-                    }, 5000);
-                };
-
-                const stop = (e) => {
-                    if (e.code === "Space") e.preventDefault();
-                    isHolding = false;
-                    clearTimeout(timer);
+                timer = setTimeout(() => {
+                    document.body.style.overflow = originalOverflow;
+                    document.body.style.paddingRight = originalPadding;
+                    host.remove();
                     clearInterval(interval);
-                    btn.classList.remove("is-holding");
-                    btn.innerText = "Hold to resume";
-                };
+                    chrome.runtime.sendMessage({ type: "pauseStateChanged", status: "resumed" });
+                    window.removeEventListener("keydown", keydownHandler);
+                    window.removeEventListener("keyup", keyupHandler);
+                }, 5000);
+            };
 
-                const keydownHandler = (e) => {
-                    if (e.code === "Space") start(e);
-                };
+            const stop = (e) => {
+                if (e.code === "Space") e.preventDefault();
+                isHolding = false;
+                clearTimeout(timer);
+                clearInterval(interval);
+                btn.classList.remove("is-holding");
+                btn.innerText = "Hold to resume";
+            };
 
-                const keyupHandler = (e) => {
-                    if (e.code === "Space") stop(e);
-                };
+            const keydownHandler = (e) => {
+                if (e.code === "Space") start(e);
+            };
 
-                btn.addEventListener("mousedown", start);
-                btn.addEventListener("touchstart", start);
-                btn.addEventListener("mouseup", stop);
-                btn.addEventListener("mouseleave", stop);
-                btn.addEventListener("touchend", stop);
-                window.addEventListener("keydown", keydownHandler);
-                window.addEventListener("keyup", keyupHandler);
-            })();
+            const keyupHandler = (e) => {
+                if (e.code === "Space") stop(e);
+            };
+
+            btn.addEventListener("mousedown", start);
+            btn.addEventListener("touchstart", start);
+            btn.addEventListener("mouseup", stop);
+            btn.addEventListener("mouseleave", stop);
+            btn.addEventListener("touchend", stop);
+            window.addEventListener("keydown", keydownHandler);
+            window.addEventListener("keyup", keyupHandler);
         },
+        args: [css],
     }).catch((err) => console.error("Pause Tab: Script injection failed:", err));
 };
 
 // TIME TOAST
 
-const injectTimeTracking = (tab) => {
+const injectTimeTracking = async (tab) => {
     if (!tab || !tab.id) return;
 
     // Don't inject into restricted URLs
@@ -132,24 +141,13 @@ const injectTimeTracking = (tab) => {
     )
         return;
 
+    const css = await fetchCss("styles/global.css", "styles/components.css", "styles/toast.css");
+
     chrome.scripting
         .executeScript({
             target: { tabId: tab.id },
-            func: (domain, favIconUrl) => {
+            func: (domain, favIconUrl, css) => {
                 if (window.pauseTabInterval) clearInterval(window.pauseTabInterval);
-
-                // CSS is fetched once and cached for subsequent toasts
-                let css = null;
-                const getCss = async () => {
-                    if (css) return css;
-                    const [a, b, c] = await Promise.all([
-                        fetch(chrome.runtime.getURL("styles/global.css")).then((r) => r.text()),
-                        fetch(chrome.runtime.getURL("styles/components.css")).then((r) => r.text()),
-                        fetch(chrome.runtime.getURL("styles/toast.css")).then((r) => r.text()),
-                    ]);
-                    css = [a, b, c].join("\n");
-                    return css;
-                };
 
                 window.pauseTabInterval = setInterval(() => {
                     if (!chrome.runtime || !chrome.runtime.id) {
@@ -174,7 +172,7 @@ const injectTimeTracking = (tab) => {
                             if (document.getElementById("pause-tab-toast-host")) return;
                             if (!document.body) return;
 
-                            getCss().then((cssText) => {
+                            {
                                 const host = document.createElement("div");
                                 host.id = "pause-tab-toast-host";
                                 document.body.appendChild(host);
@@ -182,7 +180,7 @@ const injectTimeTracking = (tab) => {
                                 const shadow = host.attachShadow({ mode: "open" });
 
                                 const style = document.createElement("style");
-                                style.textContent = cssText;
+                                style.textContent = css;
                                 shadow.appendChild(style);
 
                                 const container = document.createElement("div");
@@ -204,7 +202,7 @@ const injectTimeTracking = (tab) => {
                                 const remove = () => { if (host.parentNode) host.remove(); };
                                 setTimeout(remove, 12000);
                                 host.addEventListener("click", remove);
-                            });
+                            }
                         }
                     });
                 }, 1000);
@@ -212,6 +210,7 @@ const injectTimeTracking = (tab) => {
             args: [
                 getDomain(tab.url),
                 typeof tab.favIconUrl === "string" ? tab.favIconUrl : null,
+                css,
             ],
         })
         .catch(() => { });
