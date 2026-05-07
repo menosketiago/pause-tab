@@ -377,6 +377,13 @@ chrome.tabs.onUpdated.addListener((id, change, tab) => {
         chrome.tabs.get(id, (fullTab) => {
             if (chrome.runtime.lastError) return;
 
+            const domainKey = `domain_${getDomain(fullTab.url)}`;
+            chrome.storage.local.get([STORAGE_KEYS.PAUSED], (res) => {
+                if ((res[STORAGE_KEYS.PAUSED] || {})[domainKey]) {
+                    injectPauseModal(fullTab);
+                }
+            });
+
             injectTimeTracking(fullTab);
 
             if (fullTab.active) updateContextMenus(getDomain(fullTab.url));

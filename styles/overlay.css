@@ -45,7 +45,7 @@
         }
 
         p {
-            margin-bottom: var(--space-medium);
+            margin-bottom:0 0 var(--space-medium);
             line-height: 140%;
             text-wrap: pretty;
 

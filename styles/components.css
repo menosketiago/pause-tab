@@ -113,8 +113,8 @@
         }
     }
 
-    &.is-holding {
-        animation: holding-pulse var(--speed-pulse) infinite ease-in-out;
+    &.is-holding:hover {
+        animation: holding-pulse var(--speed-pulse) linear infinite;
         transition: none;
     }
 }
@@ -137,22 +137,22 @@
 
 @keyframes holding-pulse {
     0% {
-        background-color: var(--color-thistle);
+        background-color: var(--btn-primary-bg);
     }
 
     25% {
-        background-color: var(--color-pastel-petal);
+        background-color: var(--color-mint);
     }
 
     50% {
-        background-color: var(--color-baby-pink);
+        background-color: var(--color-thistle);
     }
 
     75% {
-        background-color: var(--color-icy-blue);
+        background-color: var(--color-pastel-petal);
     }
 
     100% {
-        background-color: var(--color-sky-blue);
+        background-color: var(--color-baby-pink);
     }
 }

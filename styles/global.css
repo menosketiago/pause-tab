@@ -58,7 +58,7 @@
     --font-weight-extra: 800;
 
     /* Speeds */
-    --speed-default: .12s;
+    --speed-default: 0.12s;
     --speed-slow: .48s;
     --speed-pulse: 5s;
 
