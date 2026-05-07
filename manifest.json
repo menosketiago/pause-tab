@@ -1,7 +1,7 @@
 {
     "name": "Pause Tab",
     "description": "Pause any Chrome tab at will.",
-    "version": "1.6.0",
+    "version": "1.6.1",
     "manifest_version": 3,
     "action": {
         "default_icon": {

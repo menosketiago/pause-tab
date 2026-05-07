@@ -57,10 +57,16 @@ const injectPauseModal = async (tab) => {
             overlay.setAttribute("role", "dialog");
             overlay.setAttribute("aria-modal", "true");
             overlay.setAttribute("tabindex", "-1");
+            const imgBase = chrome.runtime.getURL("images/");
             overlay.innerHTML = `
                 <article class="bg-image">
+                    <picture>
+                        <source type="image/avif" srcset="${imgBase}overlay-pausenaut.avif 1x, ${imgBase}overlay-pausenaut@2x.avif 2x">
+                        <source type="image/webp" srcset="${imgBase}overlay-pausenaut.webp 1x, ${imgBase}overlay-pausenaut@2x.webp 2x">
+                        <img src="${imgBase}overlay-pausenaut.png" width="104" height="86" alt="">
+                    </picture>
                     <h1>Tab paused</h1>
-                    <p>When you are ready, hold the button below for 5 seconds to resume.</p>
+                    <p>Hold the button below pressed for 5 seconds to resume</p>
                     <footer>
                         <button id="resume-button" class="pause-tab-btn primary">Hold to resume</button>
                     </footer>
