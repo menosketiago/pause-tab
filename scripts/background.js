@@ -399,7 +399,7 @@ chrome.tabs.onUpdated.addListener((id, change, tab) => {
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
     if (info.menuItemId === "pause-this-tab") {
-        injectPauseModal(tab);
+        pauseAllTabsForDomain(getDomain(tab.url));
     }
     else if (
         info.menuItemId === "ignore-domain" ||
@@ -445,9 +445,36 @@ const removeDomainFromBlacklist = async (domain) => {
     updateContextMenus(domain);
 };
 
+const pauseAllTabsForDomain = async (domain) => {
+    if (!domain) return;
+    const tabs = await chrome.tabs.query({});
+    for (const tab of tabs) {
+        if (getDomain(tab.url) === domain) injectPauseModal(tab);
+    }
+};
+
+const resumeAllTabsForDomain = async (domain) => {
+    if (!domain) return;
+    const tabs = await chrome.tabs.query({});
+    for (const tab of tabs) {
+        if (getDomain(tab.url) === domain) {
+            chrome.scripting.executeScript({
+                target: { tabId: tab.id },
+                func: () => {
+                    const host = document.getElementById("pause-tab-overlay-host");
+                    if (!host) return;
+                    document.body.style.overflow = "";
+                    document.body.style.paddingRight = "";
+                    host.remove();
+                },
+            }).catch(() => {});
+        }
+    }
+};
+
 if (chrome.action) {
     chrome.action.onClicked.addListener((tab) => {
-        injectPauseModal(tab);
+        pauseAllTabsForDomain(getDomain(tab.url));
     });
 }
 
@@ -466,6 +493,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
             }
             else {
                 delete paused[domainKey];
+                resumeAllTabsForDomain(domain);
             }
 
             chrome.storage.local.set({ [STORAGE_KEYS.PAUSED]: paused });
@@ -493,13 +521,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         return true;
     }
     else if (msg.type === "pauseCurrentTab") {
-        if (activeTabId) {
-            chrome.tabs.get(activeTabId, (tab) => {
-                if (chrome.runtime.lastError) return;
-
-                injectPauseModal(tab);
-            });
-        }
+        pauseAllTabsForDomain(activeDomain);
     }
     else if (msg.type === "blacklistCurrentTab") {
         if (activeTabId) {

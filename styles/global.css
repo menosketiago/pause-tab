@@ -114,7 +114,7 @@
         background-size: cover;
         background-position: center;
         border-radius: inherit;
-        opacity: .15;
+        opacity: .2;
         pointer-events: none;
         z-index: -1;
     }
