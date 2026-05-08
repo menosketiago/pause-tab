@@ -84,7 +84,7 @@
             }
 
             output {
-                font-size: 8em;
+                font-size: var(--font-size-jumbo);
                 font-weight: var(--font-weight-extra);
                 font-variant-numeric: tabular-nums slashed-zero;
                 line-height: 100%;
@@ -99,6 +99,7 @@
 
             p {
                 margin: 0;
+                color: var(--color-text-subtle);
                 font-size: var(--font-size-large);
                 line-height: 140%;
                 text-wrap: pretty;
