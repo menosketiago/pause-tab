@@ -81,6 +81,10 @@
                 img {
                     display: block;
                 }
+
+                &.is-flipping {
+                    animation: pausenaut-flip var(--speed-default) ease-out both;
+                }
             }
 
             output {
@@ -204,6 +208,18 @@
 }
 
 /* ANIMATIONS */
+
+@keyframes pausenaut-flip {
+    from {
+        transform: translateY(-12px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
 
 @keyframes flip-number {
     from {

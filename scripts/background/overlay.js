@@ -54,9 +54,9 @@ export const injectPauseModal = async (tab) => {
             overlay.innerHTML = `
                 <article>
                     <picture>
-                        <source type="image/avif" srcset="${imgBase}overlay-pausenaut.avif 1x, ${imgBase}overlay-pausenaut@2x.avif 2x">
-                        <source type="image/webp" srcset="${imgBase}overlay-pausenaut.webp 1x, ${imgBase}overlay-pausenaut@2x.webp 2x">
-                        <img src="${imgBase}overlay-pausenaut.png" width="104" height="86" alt="">
+                        <source type="image/avif" srcset="${imgBase}pausenaut-overlay.avif 1x, ${imgBase}pausenaut-overlay@2x.avif 2x">
+                        <source type="image/webp" srcset="${imgBase}pausenaut-overlay.webp 1x, ${imgBase}pausenaut-overlay@2x.webp 2x">
+                        <img src="${imgBase}pausenaut-overlay.png" width="96" height="78" alt="">
                     </picture>
                     <h1>Tab paused</h1>
                     <p>Hold the button below pressed for 5 seconds to resume</p>

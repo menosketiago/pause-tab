@@ -1,13 +1,15 @@
 import { STORAGE_KEYS } from "../constants.js";
 
-const statsMinutesEl = document.getElementById("stats-big-number");
-const statsUnitEl    = document.getElementById("stats-unit");
-const statsDomainEl  = document.getElementById("stats-domain");
-const pausenautAvif  = document.getElementById("stats-pausenaut-avif");
-const pausenautWebp  = document.getElementById("stats-pausenaut-webp");
-const pausenautImg   = document.getElementById("stats-pausenaut-img");
+const statsMinutesEl   = document.getElementById("stats-big-number");
+const statsUnitEl      = document.getElementById("stats-unit");
+const statsDomainEl    = document.getElementById("stats-domain");
+const pausenautPicture = document.getElementById("stats-pausenaut");
+const pausenautAvif    = document.getElementById("stats-pausenaut-avif");
+const pausenautWebp    = document.getElementById("stats-pausenaut-webp");
+const pausenautImg     = document.getElementById("stats-pausenaut-img");
 
-let lastStatsValue = null;
+let lastStatsValue    = null;
+let lastPausenautName = null;
 
 const updatePausenaut = (seconds) => {
     const name = seconds >= 7200 ? "pausenaut-cry"
@@ -15,11 +17,23 @@ const updatePausenaut = (seconds) => {
                : seconds >= 1800 ? "pausenaut-smile"
                : "pausenaut-flirty";
 
+    if (name === lastPausenautName) return;
+
     const base = `../images/${name}`;
-    
     pausenautAvif.srcset = `${base}.avif 1x, ${base}@2x.avif 2x`;
     pausenautWebp.srcset = `${base}.webp 1x, ${base}@2x.webp 2x`;
     pausenautImg.src     = `${base}.png`;
+
+    if (lastPausenautName !== null) {
+        pausenautPicture.classList.add("is-flipping");
+        pausenautPicture.addEventListener(
+            "animationend",
+            () => pausenautPicture.classList.remove("is-flipping"),
+            { once: true },
+        );
+    }
+
+    lastPausenautName = name;
 };
 
 export const loadStats = (currentDomain) => {

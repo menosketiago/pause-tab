@@ -79,8 +79,8 @@
 
     --color-overlay-bg: color-mix(in hsl, var(--color-bg) 60%, transparent);
 
-    --bg-gradient: var(--color-bg) linear-gradient(to top,
-            hsl(from var(--color-bg) h s 0.24) -120%,
+    --bg-gradient: var(--color-bg) linear-gradient(to bottom,
+            hsl(from var(--color-bg) h s 18%),
             var(--color-bg));
 
     /* Buttons */
