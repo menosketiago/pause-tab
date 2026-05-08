@@ -1,247 +1,9 @@
-// PAUSE OVERLAY
-
-// Fetches CSS files in the background (full extension access) and rewrites
-// relative asset URLs to absolute chrome-extension:// URLs before passing to pages
-const fetchCss = async (...paths) => {
-    const extBase = chrome.runtime.getURL("");
-    const texts = await Promise.all(
-        paths.map((p) => fetch(chrome.runtime.getURL(p)).then((r) => r.text()))
-    );
-    return texts.join("\n")
-        .replace(/url\(["']?\.\.\//g, `url("${extBase}`)
-        // :root doesn't match in shadow trees (shadow root is a DocumentFragment, not an element)
-        // :host matches the shadow host and lets custom properties cascade into the tree
-        .replace(/:root\b/g, ":host");
-};
-
-const injectPauseModal = async (tab) => {
-    if (
-        !tab ||
-        !tab.id ||
-        !tab.url ||
-        tab.url.startsWith("chrome://") ||
-        tab.url.includes("chrome.google.com/webstore")
-    ) {
-        console.warn("Pause Tab: Action blocked on restricted Google/System pages.");
-        return;
-    }
-
-    const css = await fetchCss("styles/global.css", "styles/components.css", "styles/overlay.css");
-
-    chrome.scripting.executeScript({
-        target: { tabId: tab.id },
-        func: (css) => {
-            if (document.getElementById("pause-tab-overlay-host")) return;
-
-            const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
-            const originalOverflow = document.body.style.overflow;
-            const originalPadding = document.body.style.paddingRight;
-
-            if (scrollBarWidth > 0) document.body.style.paddingRight = `${scrollBarWidth}px`;
-            document.body.style.overflow = "hidden";
-
-            chrome.runtime.sendMessage({ type: "pauseStateChanged", status: "paused" });
-
-            const host = document.createElement("div");
-            host.id = "pause-tab-overlay-host";
-            document.body.appendChild(host);
-
-            const shadow = host.attachShadow({ mode: "open" });
-
-            const style = document.createElement("style");
-            style.textContent = css;
-            shadow.appendChild(style);
-
-            const overlay = document.createElement("div");
-            overlay.id = "pause-tab-overlay";
-            overlay.setAttribute("role", "dialog");
-            overlay.setAttribute("aria-modal", "true");
-            overlay.setAttribute("tabindex", "-1");
-            const imgBase = chrome.runtime.getURL("images/");
-            overlay.innerHTML = `
-                <article>
-                    <picture>
-                        <source type="image/avif" srcset="${imgBase}overlay-pausenaut.avif 1x, ${imgBase}overlay-pausenaut@2x.avif 2x">
-                        <source type="image/webp" srcset="${imgBase}overlay-pausenaut.webp 1x, ${imgBase}overlay-pausenaut@2x.webp 2x">
-                        <img src="${imgBase}overlay-pausenaut.png" width="104" height="86" alt="">
-                    </picture>
-                    <h1>Tab paused</h1>
-                    <p>Hold the button below pressed for 5 seconds to resume</p>
-                    <footer>
-                        <button id="resume-button" class="pause-tab-btn primary">Hold to resume</button>
-                    </footer>
-                </article>
-            `;
-            shadow.appendChild(overlay);
-            overlay.focus();
-
-            const btn = shadow.querySelector("#resume-button");
-
-            let timer, interval, remaining;
-            let isHolding = false;
-
-            const start = (e) => {
-                if (e.code === "Space") e.preventDefault();
-                if (isHolding || e.repeat) return;
-
-                isHolding = true;
-                remaining = 5;
-                btn.classList.add("is-holding");
-                btn.innerText = remaining;
-
-                interval = setInterval(() => {
-                    remaining--;
-                    btn.innerText = remaining > 0 ? remaining : "";
-                }, 1000);
-
-                timer = setTimeout(() => {
-                    document.body.style.overflow = originalOverflow;
-                    document.body.style.paddingRight = originalPadding;
-                    host.remove();
-                    clearInterval(interval);
-                    chrome.runtime.sendMessage({ type: "pauseStateChanged", status: "resumed" });
-                    window.removeEventListener("keydown", keydownHandler);
-                    window.removeEventListener("keyup", keyupHandler);
-                }, 5000);
-            };
-
-            const stop = (e) => {
-                if (e.code === "Space") e.preventDefault();
-                isHolding = false;
-                clearTimeout(timer);
-                clearInterval(interval);
-                btn.classList.remove("is-holding");
-                btn.innerText = "Hold to resume";
-            };
-
-            const keydownHandler = (e) => {
-                if (e.code === "Space") start(e);
-            };
-
-            const keyupHandler = (e) => {
-                if (e.code === "Space") stop(e);
-            };
-
-            btn.addEventListener("mousedown", start);
-            btn.addEventListener("touchstart", start);
-            btn.addEventListener("mouseup", stop);
-            btn.addEventListener("mouseleave", stop);
-            btn.addEventListener("touchend", stop);
-            window.addEventListener("keydown", keydownHandler);
-            window.addEventListener("keyup", keyupHandler);
-        },
-        args: [css],
-    }).catch((err) => console.error("Pause Tab: Script injection failed:", err));
-};
-
-// TIME TOAST
-
-const injectTimeTracking = async (tab) => {
-    if (!tab || !tab.id) return;
-
-    // Don't inject into restricted URLs
-    if (
-        !tab.url ||
-        tab.url.startsWith("chrome://") ||
-        tab.url.includes("chrome.google.com/webstore")
-    )
-        return;
-
-    const css = await fetchCss("styles/global.css", "styles/components.css", "styles/toast.css");
-
-    chrome.scripting
-        .executeScript({
-            target: { tabId: tab.id },
-            func: (domain, favIconUrl, css) => {
-                if (window.pauseTabInterval) clearInterval(window.pauseTabInterval);
-
-                window.pauseTabInterval = setInterval(() => {
-                    if (!chrome.runtime || !chrome.runtime.id) {
-                        clearInterval(window.pauseTabInterval);
-                        return;
-                    }
-
-                    // Pause overlay takes priority — don't show toast while paused
-                    if (document.getElementById("pause-tab-overlay-host")) return;
-
-                    chrome.storage.local.get(["timeTracking"], (res) => {
-                        if (chrome.runtime.lastError) {
-                            clearInterval(window.pauseTabInterval);
-                            return;
-                        }
-
-                        const timeTracking = res.timeTracking || {};
-                        const time = timeTracking[`domain_${domain}`] || 0;
-
-                        // Trigger toast every 15 minutes (900 seconds)
-                        if (time > 0 && time % 900 === 0) {
-                            if (document.getElementById("pause-tab-toast-host")) return;
-                            if (!document.body) return;
-
-                            {
-                                const host = document.createElement("div");
-                                host.id = "pause-tab-toast-host";
-                                document.body.appendChild(host);
-
-                                const shadow = host.attachShadow({ mode: "open" });
-
-                                const style = document.createElement("style");
-                                style.textContent = css;
-                                shadow.appendChild(style);
-
-                                const container = document.createElement("div");
-                                container.id = "pause-tab-toast-container";
-
-                                const toast = document.createElement("div");
-                                toast.id = "pause-tab-toast";
-
-                                let content = "";
-                                if (favIconUrl && typeof favIconUrl === "string") {
-                                    content = `<img src="${favIconUrl}" />`;
-                                }
-                                content += `<span>Used for ${Math.floor(time / 60)}m</span>`;
-                                toast.innerHTML = content;
-
-                                container.appendChild(toast);
-                                shadow.appendChild(container);
-
-                                const remove = () => { if (host.parentNode) host.remove(); };
-                                setTimeout(remove, 12000);
-                                host.addEventListener("click", remove);
-                            }
-                        }
-                    });
-                }, 1000);
-            },
-            args: [
-                getDomain(tab.url),
-                typeof tab.favIconUrl === "string" ? tab.favIconUrl : null,
-                css,
-            ],
-        })
-        .catch(() => { });
-};
-
-// TRACKING CONSTANTS & BACKGROUND LOGIC
-
-const STORAGE_KEYS = {
-    TIME: "timeTracking",
-    DATE: "lastResetDate",
-    PAUSED: "pausedDomains",
-    BLACKLIST: "blacklistedDomains",
-};
-
-const getLocalDate = () => new Date().toISOString().split("T")[0];
-
-const getDomain = (url) => {
-    if (!url) return null;
-
-    try {
-        return new URL(url).hostname.replace(/^www\./, "");
-    } catch {
-        return null;
-    }
-};
+import { STORAGE_KEYS, MSG } from "./constants.js";
+import { getDomain, getLocalDate } from "./background/utils.js";
+import { injectPauseModal, pauseAllTabsForDomain, resumeAllTabsForDomain } from "./background/overlay.js";
+import { injectTimeTracking } from "./background/toast.js";
+import { updateContextMenus } from "./background/tabs.js";
+import { addDomainToBlacklist, removeDomainFromBlacklist } from "./background/storage.js";
 
 let activeTabId = null;
 let activeDomain = null;
@@ -251,14 +13,14 @@ const updateActiveTab = async () => {
 
     if (tab && tab.id) {
         activeTabId = tab.id;
-    } 
+    }
     else {
         activeTabId = null;
     }
 
     if (tab) {
         activeDomain = getDomain(tab.url);
-    } 
+    }
     else {
         activeDomain = null;
     }
@@ -298,8 +60,6 @@ const startGlobalTimer = () => {
         }
     }, 1000);
 };
-
-// INITIALIZE THE EXTENSION
 
 chrome.runtime.onInstalled.addListener(async () => {
     chrome.contextMenus.create({
@@ -348,19 +108,6 @@ chrome.runtime.onInstalled.addListener(async () => {
     updateActiveTab();
 });
 
-// EVENT LISTENERS
-
-const updateContextMenus = async (domain) => {
-    const domainKey = `domain_${domain}`;
-    const res = await chrome.storage.local.get([STORAGE_KEYS.BLACKLIST]);
-    const isBlacklisted = !!(res[STORAGE_KEYS.BLACKLIST] || {})[domainKey];
-
-    chrome.contextMenus.update("ignore-domain", { visible: !isBlacklisted });
-    chrome.contextMenus.update("ignore-domain-action", { visible: !isBlacklisted });
-    chrome.contextMenus.update("track-domain", { visible: isBlacklisted });
-    chrome.contextMenus.update("track-domain-action", { visible: isBlacklisted });
-};
-
 chrome.tabs.onActivated.addListener(async (info) => {
     const tab = await chrome.tabs.get(info.tabId);
 
@@ -373,7 +120,8 @@ chrome.tabs.onActivated.addListener(async (info) => {
 chrome.windows.onFocusChanged.addListener(async (windowId) => {
     if (windowId === chrome.windows.WINDOW_ID_NONE) {
         activeTabId = null;
-    } else {
+    }
+    else {
         updateActiveTab();
     }
 });
@@ -416,62 +164,6 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     }
 });
 
-const addDomainToBlacklist = async (tab) => {
-    const domain = getDomain(tab.url);
-
-    if (!domain) return;
-
-    const domainKey = `domain_${domain}`;
-    const res = await chrome.storage.local.get([STORAGE_KEYS.BLACKLIST]);
-    const blacklist = res[STORAGE_KEYS.BLACKLIST] || {};
-
-    blacklist[domainKey] = true;
-
-    await chrome.storage.local.set({ [STORAGE_KEYS.BLACKLIST]: blacklist });
-    chrome.runtime.sendMessage({ type: "blacklistUpdated" }).catch(() => { });
-
-    updateContextMenus(domain);
-};
-
-const removeDomainFromBlacklist = async (domain) => {
-    const domainKey = `domain_${domain}`;
-    const res = await chrome.storage.local.get([STORAGE_KEYS.BLACKLIST]);
-    const blacklist = res[STORAGE_KEYS.BLACKLIST] || {};
-
-    delete blacklist[domainKey];
-    await chrome.storage.local.set({ [STORAGE_KEYS.BLACKLIST]: blacklist });
-    chrome.runtime.sendMessage({ type: "blacklistUpdated" }).catch(() => { });
-
-    updateContextMenus(domain);
-};
-
-const pauseAllTabsForDomain = async (domain) => {
-    if (!domain) return;
-    const tabs = await chrome.tabs.query({});
-    for (const tab of tabs) {
-        if (getDomain(tab.url) === domain) injectPauseModal(tab);
-    }
-};
-
-const resumeAllTabsForDomain = async (domain) => {
-    if (!domain) return;
-    const tabs = await chrome.tabs.query({});
-    for (const tab of tabs) {
-        if (getDomain(tab.url) === domain) {
-            chrome.scripting.executeScript({
-                target: { tabId: tab.id },
-                func: () => {
-                    const host = document.getElementById("pause-tab-overlay-host");
-                    if (!host) return;
-                    document.body.style.overflow = "";
-                    document.body.style.paddingRight = "";
-                    host.remove();
-                },
-            }).catch(() => {});
-        }
-    }
-};
-
 if (chrome.action) {
     chrome.action.onClicked.addListener((tab) => {
         pauseAllTabsForDomain(getDomain(tab.url));
@@ -479,7 +171,7 @@ if (chrome.action) {
 }
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-    if (msg.type === "pauseStateChanged") {
+    if (msg.type === MSG.PAUSE_STATE_CHANGED) {
         const domain = getDomain(sender.url);
         const domainKey = `domain_${domain}`;
 
@@ -499,31 +191,28 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
             chrome.storage.local.set({ [STORAGE_KEYS.PAUSED]: paused });
         });
     }
-    else if (msg.type === "addToBlacklist") {
+    else if (msg.type === MSG.ADD_TO_BLACKLIST) {
         addDomainToBlacklist({ url: `https://${msg.domain}` }).then(() => {
             sendResponse({ success: true });
         });
-
         return true;
     }
-    else if (msg.type === "removeFromBlacklist") {
+    else if (msg.type === MSG.REMOVE_FROM_BLACKLIST) {
         removeDomainFromBlacklist(msg.domain).then(() => {
             sendResponse({ success: true });
         });
-
         return true;
     }
-    else if (msg.type === "getBlacklist") {
+    else if (msg.type === MSG.GET_BLACKLIST) {
         chrome.storage.local.get([STORAGE_KEYS.BLACKLIST], (res) => {
             sendResponse({ blacklist: res[STORAGE_KEYS.BLACKLIST] || {} });
         });
-
         return true;
     }
-    else if (msg.type === "pauseCurrentTab") {
+    else if (msg.type === MSG.PAUSE_CURRENT_TAB) {
         pauseAllTabsForDomain(activeDomain);
     }
-    else if (msg.type === "resumeCurrentTab") {
+    else if (msg.type === MSG.RESUME_CURRENT_TAB) {
         if (!activeDomain) return;
         const domainKey = `domain_${activeDomain}`;
         chrome.storage.local.get([STORAGE_KEYS.PAUSED], (res) => {
@@ -533,11 +222,10 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         });
         resumeAllTabsForDomain(activeDomain);
     }
-    else if (msg.type === "blacklistCurrentTab") {
+    else if (msg.type === MSG.BLACKLIST_CURRENT_TAB) {
         if (activeTabId) {
             chrome.tabs.get(activeTabId, (tab) => {
                 if (chrome.runtime.lastError) return;
-
                 addDomainToBlacklist(tab);
             });
         }

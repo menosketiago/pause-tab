@@ -7,7 +7,7 @@
     body {
         margin: 0;
         overflow: hidden;
-        background-color: var(--color-bg);
+        background: var(--bg-gradient);
         color: var(--color-text-subtle);
         font-family: var(--font-family);
         font-size: var(--font-size-base);
@@ -75,8 +75,20 @@
             align-items: center;
             text-align: center;
 
+            picture {
+                margin-bottom: var(--space-large);
+
+                img {
+                    display: block;
+                }
+
+                &.is-flipping {
+                    animation: pausenaut-flip var(--speed-default) ease-out both;
+                }
+            }
+
             output {
-                font-size: 8em;
+                font-size: var(--font-size-jumbo);
                 font-weight: var(--font-weight-extra);
                 font-variant-numeric: tabular-nums slashed-zero;
                 line-height: 100%;
@@ -91,6 +103,7 @@
 
             p {
                 margin: 0;
+                color: var(--color-text-subtle);
                 font-size: var(--font-size-large);
                 line-height: 140%;
                 text-wrap: pretty;
@@ -195,6 +208,18 @@
 }
 
 /* ANIMATIONS */
+
+@keyframes pausenaut-flip {
+    from {
+        transform: translateY(-12px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
 
 @keyframes flip-number {
     from {
