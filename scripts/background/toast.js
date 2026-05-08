@@ -43,12 +43,14 @@ export const injectTimeTracking = async (tab) => {
 
                             {
                                 const host = document.createElement("div");
+
                                 host.id = "pause-tab-toast-host";
                                 document.body.appendChild(host);
 
                                 const shadow = host.attachShadow({ mode: "open" });
 
                                 const style = document.createElement("style");
+
                                 style.textContent = css;
                                 shadow.appendChild(style);
 
@@ -59,6 +61,7 @@ export const injectTimeTracking = async (tab) => {
                                 toast.id = "pause-tab-toast";
 
                                 let content = "";
+
                                 if (favIconUrl && typeof favIconUrl === "string") {
                                     content = `<img src="${favIconUrl}" />`;
                                 }
@@ -69,7 +72,11 @@ export const injectTimeTracking = async (tab) => {
                                 shadow.appendChild(container);
 
                                 const remove = () => { if (host.parentNode) host.remove(); };
+
+                                // Remove the toast after a set time
                                 setTimeout(remove, 12000);
+
+                                // Remove the toast if the user clicks on it
                                 host.addEventListener("click", remove);
                             }
                         }

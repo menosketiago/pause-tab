@@ -9,6 +9,7 @@ export const injectPauseModal = async (tab) => {
         tab.url.includes("chrome.google.com/webstore")
     ) {
         console.warn("Pause Tab: Action blocked on restricted Google/System pages.");
+
         return;
     }
 
@@ -24,26 +25,32 @@ export const injectPauseModal = async (tab) => {
             const originalPadding = document.body.style.paddingRight;
 
             if (scrollBarWidth > 0) document.body.style.paddingRight = `${scrollBarWidth}px`;
+
             document.body.style.overflow = "hidden";
 
             chrome.runtime.sendMessage({ type: "pauseStateChanged", status: "paused" });
 
             const host = document.createElement("div");
+
             host.id = "pause-tab-overlay-host";
             document.body.appendChild(host);
 
             const shadow = host.attachShadow({ mode: "open" });
 
             const style = document.createElement("style");
+
             style.textContent = css;
             shadow.appendChild(style);
 
             const overlay = document.createElement("div");
+
             overlay.id = "pause-tab-overlay";
             overlay.setAttribute("role", "dialog");
             overlay.setAttribute("aria-modal", "true");
             overlay.setAttribute("tabindex", "-1");
+
             const imgBase = chrome.runtime.getURL("images/");
+
             overlay.innerHTML = `
                 <article>
                     <picture>
@@ -72,6 +79,7 @@ export const injectPauseModal = async (tab) => {
 
                 isHolding = true;
                 remaining = 5;
+
                 btn.classList.add("is-holding");
                 btn.innerText = remaining;
 
@@ -83,9 +91,12 @@ export const injectPauseModal = async (tab) => {
                 timer = setTimeout(() => {
                     document.body.style.overflow = originalOverflow;
                     document.body.style.paddingRight = originalPadding;
+
                     host.remove();
                     clearInterval(interval);
                     chrome.runtime.sendMessage({ type: "pauseStateChanged", status: "resumed" });
+
+                    // Remove event listeners
                     window.removeEventListener("keydown", keydownHandler);
                     window.removeEventListener("keyup", keyupHandler);
                 }, 5000);
@@ -93,9 +104,11 @@ export const injectPauseModal = async (tab) => {
 
             const stop = (e) => {
                 if (e.code === "Space") e.preventDefault();
+
                 isHolding = false;
                 clearTimeout(timer);
                 clearInterval(interval);
+
                 btn.classList.remove("is-holding");
                 btn.innerText = "Hold to resume";
             };
@@ -108,6 +121,7 @@ export const injectPauseModal = async (tab) => {
                 if (e.code === "Space") stop(e);
             };
 
+            // Add event listeners
             btn.addEventListener("mousedown", start);
             btn.addEventListener("touchstart", start);
             btn.addEventListener("mouseup", stop);
@@ -122,7 +136,9 @@ export const injectPauseModal = async (tab) => {
 
 export const pauseAllTabsForDomain = async (domain) => {
     if (!domain) return;
+
     const tabs = await chrome.tabs.query({});
+
     for (const tab of tabs) {
         if (getDomain(tab.url) === domain) injectPauseModal(tab);
     }
@@ -130,16 +146,21 @@ export const pauseAllTabsForDomain = async (domain) => {
 
 export const resumeAllTabsForDomain = async (domain) => {
     if (!domain) return;
+
     const tabs = await chrome.tabs.query({});
+
     for (const tab of tabs) {
         if (getDomain(tab.url) === domain) {
             chrome.scripting.executeScript({
                 target: { tabId: tab.id },
                 func: () => {
                     const host = document.getElementById("pause-tab-overlay-host");
+
                     if (!host) return;
+
                     document.body.style.overflow = "";
                     document.body.style.paddingRight = "";
+                    
                     host.remove();
                 },
             }).catch(() => {});

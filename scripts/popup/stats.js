@@ -14,7 +14,9 @@ const updatePausenaut = (seconds) => {
                : seconds >= 3600 ? "pausenaut-surprised"
                : seconds >= 1800 ? "pausenaut-smile"
                : "pausenaut-flirty";
+
     const base = `../images/${name}`;
+    
     pausenautAvif.srcset = `${base}.avif 1x, ${base}@2x.avif 2x`;
     pausenautWebp.srcset = `${base}.webp 1x, ${base}@2x.webp 2x`;
     pausenautImg.src     = `${base}.png`;
@@ -39,8 +41,10 @@ export const loadStats = (currentDomain) => {
         }
         else {
             displayValue = totalMinutes;
+
             const hours = Math.floor(totalMinutes / 60);
             const mins = totalMinutes % 60;
+            
             unitText = `minutes (${hours}h ${mins}m)`;
         }
 
@@ -67,6 +71,7 @@ export const loadStats = (currentDomain) => {
 
         statsUnitEl.textContent = unitText;
         statsDomainEl.textContent = currentDomain;
+
         updatePausenaut(seconds);
     });
 };

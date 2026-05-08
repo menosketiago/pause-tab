@@ -4,6 +4,7 @@ import { updateContextMenus } from "./tabs.js";
 
 export const addDomainToBlacklist = async (tab) => {
     const domain = getDomain(tab.url);
+    
     if (!domain) return;
 
     const domainKey = `domain_${domain}`;
@@ -24,6 +25,7 @@ export const removeDomainFromBlacklist = async (domain) => {
     const blacklist = res[STORAGE_KEYS.BLACKLIST] || {};
 
     delete blacklist[domainKey];
+
     await chrome.storage.local.set({ [STORAGE_KEYS.BLACKLIST]: blacklist });
     chrome.runtime.sendMessage({ type: MSG.BLACKLIST_UPDATED }).catch(() => {});
 

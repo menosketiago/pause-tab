@@ -16,6 +16,7 @@ export const fetchCss = async (...paths) => {
     const texts = await Promise.all(
         paths.map((p) => fetch(chrome.runtime.getURL(p)).then((r) => r.text()))
     );
+    
     return texts.join("\n")
         .replace(/url\(["']?\.\.\//g, `url("${extBase}`)
         // :root doesn't match in shadow trees (shadow root is a DocumentFragment, not an element)
