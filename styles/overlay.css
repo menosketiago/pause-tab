@@ -28,9 +28,7 @@
         width: 360px;
         padding: var(--space-extra);
         padding-top: calc(var(--space-extra) + var(--space-large));
-        background: var(--color-bg) linear-gradient(to top,
-                hsl(from var(--color-bg) h s 0.12) -120%,
-                var(--color-bg));
+        background: var(--bg-gradient);
         text-align: center;
         border: var(--border-subtle);
         border-radius: var(--radius-large);
