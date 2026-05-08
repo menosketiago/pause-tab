@@ -78,25 +78,3 @@
         }
     }
 }
-
-@keyframes holding-pulse {
-    0% {
-        background-color: var(--color-thistle);
-    }
-
-    25% {
-        background-color: var(--color-pastel-petal);
-    }
-
-    50% {
-        background-color: var(--color-baby-pink);
-    }
-
-    75% {
-        background-color: var(--color-icy-blue);
-    }
-
-    100% {
-        background-color: var(--color-sky-blue);
-    }
-}

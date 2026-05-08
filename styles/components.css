@@ -114,7 +114,7 @@
         }
     }
 
-    &.is-holding:hover {
+    &.is-holding {
         animation: holding-pulse var(--speed-pulse) linear infinite;
         transition: none;
     }
