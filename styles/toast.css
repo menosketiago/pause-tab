@@ -47,6 +47,7 @@
     font-size: var(--font-size-base);
     font-optical-sizing: auto;
     font-weight: var(--font-weight-bold);
+    letter-spacing: var(--font-letter-spacing);
     white-space: nowrap;
     pointer-events: all;
     cursor: pointer;

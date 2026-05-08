@@ -12,6 +12,7 @@
     font-family: var(--font-family);
     font-size: var(--font-size-base);
     font-optical-sizing: auto;
+    letter-spacing: var(--font-letter-spacing);
     backdrop-filter: blur(12px);
     z-index: 2147483647;
     pointer-events: all;
@@ -21,12 +22,13 @@
     }
 
     article {
+        position: relative;
         display: flex;
         flex-direction: column;
         width: 360px;
         padding: var(--space-extra);
         padding-top: calc(var(--space-extra) + var(--space-large));
-        background: var(--color-bg) linear-gradient(340deg,
+        background: var(--color-bg) linear-gradient(to top,
                 hsl(from var(--color-bg) h s 0.12) -120%,
                 var(--color-bg));
         text-align: center;
@@ -73,10 +75,6 @@
             gap: var(--space-small);
             width: 100%;
             margin-top: var(--space-large);
-        }
-
-        &.bg-image::before {
-            background-size: 200%;
         }
     }
 }

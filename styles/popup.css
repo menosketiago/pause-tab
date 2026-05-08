@@ -13,6 +13,7 @@
         font-size: var(--font-size-base);
         font-optical-sizing: auto;
         font-weight: var(--font-weight-normal);
+        letter-spacing: var(--font-letter-spacing);
     }
 
     #pages-wrapper {

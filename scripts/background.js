@@ -59,7 +59,7 @@ const injectPauseModal = async (tab) => {
             overlay.setAttribute("tabindex", "-1");
             const imgBase = chrome.runtime.getURL("images/");
             overlay.innerHTML = `
-                <article class="bg-image">
+                <article>
                     <picture>
                         <source type="image/avif" srcset="${imgBase}overlay-pausenaut.avif 1x, ${imgBase}overlay-pausenaut@2x.avif 2x">
                         <source type="image/webp" srcset="${imgBase}overlay-pausenaut.webp 1x, ${imgBase}overlay-pausenaut@2x.webp 2x">
