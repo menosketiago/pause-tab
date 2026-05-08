@@ -1,6 +1,7 @@
 const STORAGE_KEYS = {
     BLACKLIST: "blacklistedDomains",
     TIME: "timeTracking",
+    PAUSED: "pausedDomains",
 };
 
 const pagesWrapper = document.getElementById("pages-wrapper");
@@ -90,6 +91,52 @@ const loadStats = () => {
         statsDomainEl.textContent = currentDomain;
     });
 };
+
+let isPaused = false;
+let isHolding = false;
+let holdTimer, holdInterval, holdRemaining;
+
+const updatePauseBtn = () => {
+    if (!currentDomain) return;
+
+    chrome.storage.local.get([STORAGE_KEYS.PAUSED], (res) => {
+        isPaused = !!(res[STORAGE_KEYS.PAUSED] || {})[`domain_${currentDomain}`];
+        pauseTabBtn.textContent = isPaused ? "Hold to resume" : "Pause tab";
+    });
+};
+
+const startHold = () => {
+    if (!isPaused || isHolding) return;
+    isHolding = true;
+    holdRemaining = 5;
+    pauseTabBtn.classList.add("is-holding");
+    pauseTabBtn.textContent = holdRemaining;
+
+    holdInterval = setInterval(() => {
+        holdRemaining--;
+        pauseTabBtn.textContent = holdRemaining > 0 ? holdRemaining : "";
+    }, 1000);
+
+    holdTimer = setTimeout(() => {
+        chrome.runtime.sendMessage({ type: "resumeCurrentTab" });
+        window.close();
+    }, 5000);
+};
+
+const stopHold = () => {
+    if (!isHolding) return;
+    isHolding = false;
+    clearTimeout(holdTimer);
+    clearInterval(holdInterval);
+    pauseTabBtn.classList.remove("is-holding");
+    pauseTabBtn.textContent = "Hold to resume";
+};
+
+pauseTabBtn.addEventListener("mousedown", startHold);
+pauseTabBtn.addEventListener("touchstart", startHold);
+pauseTabBtn.addEventListener("mouseup", stopHold);
+pauseTabBtn.addEventListener("mouseleave", stopHold);
+pauseTabBtn.addEventListener("touchend", stopHold);
 
 const updateTrackingBtn = () => {
     if (!currentDomain) return;
@@ -186,6 +233,7 @@ const clearAll = () => {
 
 // Event listeners
 pauseTabBtn.addEventListener("click", () => {
+    if (isPaused) return;
     chrome.runtime.sendMessage({ type: "pauseCurrentTab" });
     window.close();
 });
@@ -219,6 +267,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
         } catch {}
     }
     loadStats();
+    updatePauseBtn();
     updateTrackingBtn();
     loadBlacklist();
 });
@@ -228,6 +277,9 @@ chrome.runtime.onMessage.addListener((msg) => {
     if (msg.type === "blacklistUpdated") {
         loadBlacklist();
         updateTrackingBtn();
+    }
+    else if (msg.type === "pauseStateChanged") {
+        updatePauseBtn();
     }
 });
 

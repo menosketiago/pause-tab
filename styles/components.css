@@ -130,10 +130,16 @@
     border-radius: var(--radius-round);
 }
 
-/* Class to hide elements */
+/* State classes */
 
 .is-hidden {
     display: none !important;
+}
+
+.is-disabled {
+    opacity: 0.4;
+    cursor: default;
+    pointer-events: none;
 }
 
 @keyframes holding-pulse {

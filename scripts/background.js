@@ -523,6 +523,16 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     else if (msg.type === "pauseCurrentTab") {
         pauseAllTabsForDomain(activeDomain);
     }
+    else if (msg.type === "resumeCurrentTab") {
+        if (!activeDomain) return;
+        const domainKey = `domain_${activeDomain}`;
+        chrome.storage.local.get([STORAGE_KEYS.PAUSED], (res) => {
+            const paused = res[STORAGE_KEYS.PAUSED] || {};
+            delete paused[domainKey];
+            chrome.storage.local.set({ [STORAGE_KEYS.PAUSED]: paused });
+        });
+        resumeAllTabsForDomain(activeDomain);
+    }
     else if (msg.type === "blacklistCurrentTab") {
         if (activeTabId) {
             chrome.tabs.get(activeTabId, (tab) => {
