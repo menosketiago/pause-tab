@@ -61,7 +61,7 @@ const startGlobalTimer = () => {
     }, 1000);
 };
 
-chrome.runtime.onInstalled.addListener(async () => {
+chrome.runtime.onInstalled.addListener(async (details) => {
     chrome.contextMenus.create({
         id: "pause-this-tab",
         title: "Pause this tab",
@@ -98,12 +98,14 @@ chrome.runtime.onInstalled.addListener(async () => {
         contexts: ["action"],
     });
 
-    await chrome.storage.local.set({
-        [STORAGE_KEYS.TIME]: {},
-        [STORAGE_KEYS.DATE]: getLocalDate(),
-        [STORAGE_KEYS.PAUSED]: {},
-        [STORAGE_KEYS.BLACKLIST]: {},
-    });
+    if (details.reason === "install") {
+        await chrome.storage.local.set({
+            [STORAGE_KEYS.TIME]: {},
+            [STORAGE_KEYS.DATE]: getLocalDate(),
+            [STORAGE_KEYS.PAUSED]: {},
+            [STORAGE_KEYS.BLACKLIST]: {},
+        });
+    }
 
     updateActiveTab();
 });
